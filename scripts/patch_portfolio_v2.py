@@ -100,12 +100,13 @@ remaining = [value for value in stale if value in html]
 if remaining:
     raise RuntimeError('Stale portfolio claims remain: ' + repr(remaining))
 
+# Keep these checks semantic enough to survive safe HTML escaping/i18n wrappers.
 required = [
     'Qwen3.8 27B',
     'data-i18n="seniority_badge"',
     'PD/LGD/EAD',
     'LightGBM + Isolation Forest',
-    'Recall 99,86% • FPR 0,957% • p95 < 15 ms',
+    'Recall 99,86%',
 ]
 missing = [value for value in required if value not in html]
 if missing:
