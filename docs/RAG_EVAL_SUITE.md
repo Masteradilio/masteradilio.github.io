@@ -148,4 +148,5 @@ When a canonical project README changes materially, rerun this suite before cons
 - A transport/provider failure must advance to the next independent gateway.
 - An invalid or truncated answer must never be shown merely because a provider returned HTTP 200.
 - Successful content responses must remain live `llm-rag`; no substantive canned response may be introduced.
+- Successful responses must expose `gateway_used` and `model_used` internally for diagnostics without rendering routing details to recruiters.
 - Final `unavailable` is acceptable only after all configured independent gateways fail or return answers rejected by the deterministic gates.
