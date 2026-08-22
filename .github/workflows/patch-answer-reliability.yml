@@ -54,3 +54,5 @@ jobs:
           fi
           git commit -m 'Harden live recruiter answer completeness and retries'
           git push origin HEAD:career-assistant-answer-reliability-20260822
+
+# one-time reliability migration trigger
