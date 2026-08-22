@@ -9,7 +9,7 @@ body{font-family:system-ui,sans-serif;background:#07101f;color:#e5eefb;margin:0;
 </style>
 </head>
 <body><main>
-<!-- recruiter audit v2026.13 -->
+<!-- recruiter audit v2026.14 -->
 <h1>Career Assistant — Live 10/10 Audit</h1>
 <p>This temporary page sends recruiter-facing questions to the same production Worker used by the portfolio.</p>
 <button id="run">Run 10 live tests</button>
@@ -30,8 +30,19 @@ const tests=[
 ];
 const forbidden=['thinking process','analyze user input','identify core question','system prompt','developer message','canonical repository evidence blocks',"let's draft",'i need to','i should','non-negotiable rule','final-answer contract','evidence rules'];
 function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function clauses(s){return norm(s).split(/\n+|(?<=[.!?])\s+/).map(x=>x.trim()).filter(Boolean);}
+function directDeployUpgrade(reply,employer,capability){
+ return clauses(reply).some(c=>{
+   if(!employer.test(c))return false;
+   if(/\b(?:not|never|without|no evidence (?:of|for))\b.{0,24}\bdeploy(?:ed|ment)?\b/i.test(c))return false;
+   const f=new RegExp(`\\bdeploy(?:ed|ment)?\\b.{0,36}\\b(?:${capability})\\b`,'i');
+   const r=new RegExp(`\\b(?:${capability})\\b.{0,36}\\bdeploy(?:ed|ment)?\\b`,'i');
+   return f.test(c)||r.test(c);
+ });
+}
 function validate(name,d){
- const issues=[],reply=String(d.reply||''),n=reply.toLowerCase(),words=reply.trim().split(/\s+/).filter(Boolean).length;
+ const issues=[],reply=String(d.reply||''),n=reply.toLowerCase(),nn=norm(reply),words=reply.trim().split(/\s+/).filter(Boolean).length;
  if(d.status!=='success')issues.push('status='+d.status);
  if(d.generation_mode!=='llm-rag')issues.push('generation_mode='+d.generation_mode);
  if(!d.gateway_used)issues.push('gateway_used missing');
@@ -40,11 +51,15 @@ function validate(name,d){
  if(/(^|\n)\s*#{0,3}\s*(sources?|fontes?)\s*:?/i.test(reply))issues.push('model-generated Sources section');
  if(name==='fit'){
    if(!['15+ years','financial services','brb','banpar'].some(x=>n.includes(x)))issues.push('professional lead missing');
-   if(/(?:brb|banco de bras[ií]lia)[\s\S]{0,180}deploy(?:ed|ment)?[\s\S]{0,80}(?:llm|rag|ai[- ]agent)|deploy(?:ed|ment)?[\s\S]{0,80}(?:llm|rag|ai[- ]agent)[\s\S]{0,180}(?:brb|banco de bras[ií]lia)/i.test(reply))issues.push('professional verb overclaim: deployed instead of implemented');
+   if(directDeployUpgrade(reply,/\b(?:brb|banco de brasilia)\b/i,'llm|rag|ai-agent|ai agent'))issues.push('BRB LLM/RAG verb overclaim: deployed instead of implemented');
  }
  if(name==='rag'){
-   if(/production-ready\s+rag/i.test(reply))issues.push('portfolio RAG readiness overclaim');
-   if(/(?:banpar[aá]|banpara)[\s\S]{0,180}\bdeploy(?:ed|ment)?\b[\s\S]{0,80}\brag\b|\bdeploy(?:ed|ment)?\b[\s\S]{0,80}\brag\b[\s\S]{0,180}(?:banpar[aá]|banpara)/i.test(reply))issues.push('Banpara RAG verb overclaim: deployed instead of developed');
+   if(/production[- ](?:ready|grade)\s+rag/i.test(reply))issues.push('portfolio RAG readiness overclaim');
+   if(directDeployUpgrade(reply,/\bbanpara\b/i,'rag'))issues.push('Banpara RAG verb overclaim: deployed instead of developed');
+ }
+ if(name==='results'){
+   const brbPixDeploy=clauses(reply).some(c=>/\b(?:brb|banco de brasilia)\b/i.test(c)&&(/\bdeploy(?:ed|ment)?\b.{0,42}\b(?:pix|fraud(?:-prevention| prevention)? model)\b|\b(?:pix|fraud(?:-prevention| prevention)? model)\b.{0,42}\bdeploy(?:ed|ment)?\b/i.test(c)));
+   if(brbPixDeploy)issues.push('BRB PIX deployment overclaim');
  }
  if(name==='k8s'&&!['did not find','no evidence','insufficient evidence','not find sufficient'].some(x=>n.includes(x)))issues.push('Kubernetes abstention missing');
  if(name==='llama'&&!n.includes('llamaindex'))issues.push('LlamaIndex not addressed');
