@@ -1,34 +1,18 @@
-# Portfolio finalization checklist
+# Portfolio post-deploy checklist
 
-This checklist is intentionally short. The code changes are already prepared in the review branch.
+The recruiter-facing frontend has passed the `Portfolio professionalization` GitHub Actions validation. This document tracks the remaining runtime checks after deployment.
 
-## 1. Run the GitHub validation workflow once
+## 1. Confirm GitHub Pages deployment
 
-In GitHub:
+After the portfolio PR is merged:
 
-1. Open the repository `Masteradilio/masteradilio.github.io`.
-2. Open **Actions**.
-3. Select **Portfolio professionalization**.
-4. Click **Run workflow**.
-5. The workflow itself checks out `portfolio-professionalization-20260822`, so no code editing is required.
-6. Wait for `patch-build-verify` to finish successfully.
+1. Open `https://masteradilio.github.io/`.
+2. Verify PT-BR and EN language switching.
+3. Confirm all seven project repository links open correctly.
+4. Confirm both hosted CV/Resume pages open and can be printed/saved as PDF.
+5. Share the portfolio URL in a private LinkedIn draft/message and confirm the 1200×630 Open Graph card renders correctly.
 
-The workflow will:
-
-- apply the final project-card evidence patch;
-- align hosted PT-BR and EN CV positioning with `AI Engineer | Senior Data Scientist`;
-- rebuild production Tailwind CSS;
-- regenerate the Open Graph social image;
-- run deterministic assertions against stale claims and required recruiter-facing content;
-- commit the generated files back to the review branch.
-
-If **Run workflow** is not visible, verify that GitHub Actions are enabled under repository **Settings → Actions → General**.
-
-## 2. Do not merge manually yet
-
-After the workflow is green, return to the ChatGPT conversation and report that it completed successfully. The PR can then be re-inspected and merged through the connected GitHub integration.
-
-## 3. Cloudflare Worker upgrade after the frontend merge
+## 2. Upgrade the Cloudflare Worker
 
 Use `docs/CLOUDFLARE_RAG_UPGRADE.md` as the contract.
 
@@ -55,9 +39,9 @@ Recommended response shape:
 }
 ```
 
-## 4. Post-deploy recruiter test
+## 3. Recruiter-style RAG test
 
-After the PR is merged and the Worker is updated, test at least these free-form questions:
+After the Worker is updated, test at least these free-form questions:
 
 1. `Why should I interview Adilio for an AI Engineer role?`
 2. `Which projects best demonstrate production-oriented Machine Learning and MLOps?`
@@ -67,3 +51,15 @@ After the PR is merged and the Worker is updated, test at least these free-form 
 6. `What are the limitations of the project you consider strongest for an AI Engineer position?`
 
 Question 5 is deliberately adversarial: if the retrieved sources do not prove production Kubernetes experience, the assistant should explicitly say that the available evidence is insufficient.
+
+## 4. Quality criteria for the assistant
+
+For each test answer, evaluate:
+
+- factual correctness against the retrieved CV/README evidence;
+- whether unsupported claims are refused rather than inferred;
+- relevance for a recruiter or hiring manager;
+- source quality and source-label clarity;
+- consistency across follow-up questions;
+- latency and timeout behavior;
+- PT-BR/EN language consistency.
