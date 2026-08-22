@@ -87,6 +87,11 @@ jobs:
           grep -q 'function unavailableReply' cloudflare/adilio-career-assistant.js
           grep -q "generation_mode: 'llm-rag'" cloudflare/adilio-career-assistant.js
           grep -q 'const keywords = questionKeywords(question);' cloudflare/adilio-career-assistant.js
+          grep -q 'function looksIncompleteAnswer' cloudflare/adilio-career-assistant.js
+          grep -q 'function missesRequiredProfessionalLead' cloudflare/adilio-career-assistant.js
+          grep -Fq 'const conversationalHistory = vagueFollowUp ? history : [];' cloudflare/adilio-career-assistant.js
+          grep -Fq "if (order.includes('openrouter/free')) order.push('openrouter/free');" cloudflare/adilio-career-assistant.js
+          grep -Fq "finishReason === 'length' || needsRepair(reply, plan, question)" cloudflare/adilio-career-assistant.js
           ! grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js
           ! grep -q 'function localFallback' cloudflare/adilio-career-assistant.js
           grep -q 'openrouter/free' cloudflare/adilio-career-assistant.js
@@ -100,6 +105,7 @@ jobs:
           grep -q '10/10 pass criteria' docs/RAG_EVAL_SUITE.md
           grep -q 'thinking process' docs/RAG_EVAL_SUITE.md
           grep -q 'employer metrics are never attached to portfolio projects' docs/RAG_EVAL_SUITE.md
+          grep -q 'Response-completeness regressions' docs/RAG_EVAL_SUITE.md
 
       - name: Validate Worker as Cloudflare ES module
         run: |
