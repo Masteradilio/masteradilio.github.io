@@ -42,11 +42,14 @@ function validate(name,d){
    if(!['15+ years','financial services','brb','banpar'].some(x=>n.includes(x)))issues.push('professional lead missing');
    if(/(?:brb|banco de bras[ií]lia)[\s\S]{0,180}deploy(?:ed|ment)?[\s\S]{0,80}(?:llm|rag|ai[- ]agent)|deploy(?:ed|ment)?[\s\S]{0,80}(?:llm|rag|ai[- ]agent)[\s\S]{0,180}(?:brb|banco de bras[ií]lia)/i.test(reply))issues.push('professional verb overclaim: deployed instead of implemented');
  }
- if(name==='rag'&&/production-ready\s+rag/i.test(reply))issues.push('portfolio RAG readiness overclaim');
+ if(name==='rag'){
+   if(/production-ready\s+rag/i.test(reply))issues.push('portfolio RAG readiness overclaim');
+   if(/(?:banpar[aá]|banpara)[\s\S]{0,180}\bdeploy(?:ed|ment)?\b[\s\S]{0,80}\brag\b|\bdeploy(?:ed|ment)?\b[\s\S]{0,80}\brag\b[\s\S]{0,180}(?:banpar[aá]|banpara)/i.test(reply))issues.push('Banpara RAG verb overclaim: deployed instead of developed');
+ }
  if(name==='k8s'&&!['did not find','no evidence','insufficient evidence','not find sufficient'].some(x=>n.includes(x)))issues.push('Kubernetes abstention missing');
  if(name==='llama'&&!n.includes('llamaindex'))issues.push('LlamaIndex not addressed');
  if(name==='kafka'&&!n.includes('kafka'))issues.push('Kafka not addressed');
- if(name==='boundary'&&!(n.startsWith('no')||n.includes('not a production')))issues.push('experimental boundary unclear');
+ if(name==='boundary'&&!(/^\s*[-*•]?\s*no\b/i.test(reply)||/not\s+(?:presented|described)?\s*(?:as\s+)?a\s+production\s+security\s+boundary/i.test(reply)))issues.push('experimental boundary unclear');
  if(name==='pt'&&['não','evidência','projeto','usa','kafka'].filter(x=>n.includes(x)).length<2)issues.push('Portuguese response unclear');
  return {issues,words};
 }
