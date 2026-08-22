@@ -130,3 +130,5 @@ When a canonical project README changes materially, rerun this suite before cons
 - A current MLOps question must not inherit repository selection from unrelated earlier turns.
 - DataSUS RAG Agent must not be called synthetic unless its canonical repository evidence explicitly changes.
 - Internal phrases such as `non-negotiable rule`, `rule states`, or evidence-selection mechanics must never reach the user.
+
+- A new explicit question must select repository evidence from the current question only; prior turns may support conversational continuity but must not contaminate retrieval for a different topic.

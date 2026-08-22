@@ -376,7 +376,7 @@ function evidenceExcerpt(content, keywords) {
 
 async function retrievePortfolioEvidence(question, history, repos) {
   if (!repos.length) return { context: '', sources: [] };
-  const keywords = questionKeywords([question, ...history.filter(h => h.role === 'user').slice(-2).map(h => h.content)].join(' '));
+  const keywords = questionKeywords(question);
   const fetched = (await Promise.all(repos.map(repo => fetchGithubText(repo, 'README.md')))).filter(Boolean);
   const blocks = fetched.map(item => {
     const canonical = removeCrossProjectClaims(item.repo, item.content);
@@ -467,8 +467,11 @@ function containsKnownPortfolioOverclaim(text) {
 
 function containsProfessionalAttributionError(text) {
   const q = normalizeText(text);
-  const pixAssignedToBancoDoBrasil = q.includes('banco do brasil') && (q.includes('pix') || q.includes('fraud-prevention model') || q.includes('fraud prevention model') || q.includes('97% recall'));
-  return pixAssignedToBancoDoBrasil;
+  const metric = '(pix|fraud-prevention model|fraud prevention model|97% recall)';
+  const bancoAsSubject = new RegExp(`(?:at|no|na)\\s+banco do brasil.{0,90}${metric}`, 'i');
+  const bancoPossessive = new RegExp(`banco do brasil(?:\\'s|’s)?.{0,90}${metric}`, 'i');
+  const metricAssignedToBanco = new RegExp(`${metric}.{0,90}(?:at|no|na)\\s+banco do brasil`, 'i');
+  return bancoAsSubject.test(q) || bancoPossessive.test(q) || metricAssignedToBanco.test(q);
 }
 
 function containsDataScopeOverclaim(text) {
