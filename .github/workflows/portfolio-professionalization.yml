@@ -74,7 +74,7 @@ jobs:
           grep -q 'AI ENGINEER | SENIOR DATA SCIENTIST' assets/cv_adilio_farias_en.html
           grep -q 'ENGENHEIRO DE IA | CIENTISTA DE DADOS SÊNIOR' assets/cv_adilio_farias_pt.html
 
-          grep -q "SERVICE_VERSION = '2026.11'" cloudflare/adilio-career-assistant.js
+          grep -q "SERVICE_VERSION = '2026.12'" cloudflare/adilio-career-assistant.js
           grep -q 'removeCrossProjectClaims' cloudflare/adilio-career-assistant.js
           grep -q 'containsReasoningLeak' cloudflare/adilio-career-assistant.js
           grep -q 'containsPortfolioProfessionalMix' cloudflare/adilio-career-assistant.js
@@ -83,17 +83,31 @@ jobs:
           grep -q 'containsDataScopeOverclaim' cloudflare/adilio-career-assistant.js
           grep -q 'stripModelArtifacts' cloudflare/adilio-career-assistant.js
           grep -q 'filterSourcesForReply' cloudflare/adilio-career-assistant.js
-          grep -q 'repairAnswer' cloudflare/adilio-career-assistant.js
+          grep -q 'repairAnswerAcrossGateways' cloudflare/adilio-career-assistant.js
           grep -q 'function unavailableReply' cloudflare/adilio-career-assistant.js
           grep -q "generation_mode: 'llm-rag'" cloudflare/adilio-career-assistant.js
           grep -q 'const keywords = questionKeywords(question);' cloudflare/adilio-career-assistant.js
           grep -q 'function looksIncompleteAnswer' cloudflare/adilio-career-assistant.js
           grep -q 'function missesRequiredProfessionalLead' cloudflare/adilio-career-assistant.js
           grep -Fq 'const conversationalHistory = vagueFollowUp ? history : [];' cloudflare/adilio-career-assistant.js
-          grep -Fq "if (order.includes('openrouter/free')) order.push('openrouter/free');" cloudflare/adilio-career-assistant.js
           grep -Fq "finishReason === 'length' || needsRepair(reply, plan, question)" cloudflare/adilio-career-assistant.js
           ! grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js
           ! grep -q 'function localFallback' cloudflare/adilio-career-assistant.js
+
+          grep -q 'VERCEL_AI_GATEWAY_API_KEY' cloudflare/adilio-career-assistant.js
+          grep -q 'OPENROUTER_API_KEY' cloudflare/adilio-career-assistant.js
+          grep -q 'HF_TOKEN' cloudflare/adilio-career-assistant.js
+          grep -q 'https://ai-gateway.vercel.sh/v1/chat/completions' cloudflare/adilio-career-assistant.js
+          grep -q 'https://openrouter.ai/api/v1/chat/completions' cloudflare/adilio-career-assistant.js
+          grep -q 'https://router.huggingface.co/v1/chat/completions' cloudflare/adilio-career-assistant.js
+          grep -q "VERCEL_PRIMARY_MODEL = 'openai/gpt-oss-20b'" cloudflare/adilio-career-assistant.js
+          grep -q "google/gemini-2.5-flash-lite" cloudflare/adilio-career-assistant.js
+          grep -q "meta/llama-3.3-70b" cloudflare/adilio-career-assistant.js
+          grep -q "HF_PRIMARY_MODEL = 'openai/gpt-oss-20b:fastest'" cloudflare/adilio-career-assistant.js
+          grep -q 'function gatewayRoute' cloudflare/adilio-career-assistant.js
+          grep -q 'async function callGateway' cloudflare/adilio-career-assistant.js
+          grep -q 'gateway_used' cloudflare/adilio-career-assistant.js
+
           grep -q 'openrouter/free' cloudflare/adilio-career-assistant.js
           grep -q 'openai/gpt-oss-20b:free' cloudflare/adilio-career-assistant.js
           grep -q 'nvidia/nemotron-nano-9b-v2:free' cloudflare/adilio-career-assistant.js
@@ -106,13 +120,15 @@ jobs:
           grep -q 'thinking process' docs/RAG_EVAL_SUITE.md
           grep -q 'employer metrics are never attached to portfolio projects' docs/RAG_EVAL_SUITE.md
           grep -q 'Response-completeness regressions' docs/RAG_EVAL_SUITE.md
+          grep -q 'Multi-gateway resilience' docs/RAG_EVAL_SUITE.md
 
       - name: Validate Worker as Cloudflare ES module
         run: |
           cp cloudflare/adilio-career-assistant.js /tmp/adilio-career-assistant.mjs
           node --check /tmp/adilio-career-assistant.mjs
-          test "$(grep -c '^async function callOpenRouter' cloudflare/adilio-career-assistant.js)" -eq 1
-          test "$(grep -c '^function modelOrder' cloudflare/adilio-career-assistant.js)" -eq 1
+          test "$(grep -c '^async function callJsonEndpoint' cloudflare/adilio-career-assistant.js)" -eq 1
+          test "$(grep -c '^async function callGateway' cloudflare/adilio-career-assistant.js)" -eq 1
+          test "$(grep -c '^function gatewayRoute' cloudflare/adilio-career-assistant.js)" -eq 1
           test "$(grep -c '^function explicitFileRequest' cloudflare/adilio-career-assistant.js)" -eq 1
           test "$(grep -c '^async function executeFileLookup' cloudflare/adilio-career-assistant.js)" -eq 1
 
