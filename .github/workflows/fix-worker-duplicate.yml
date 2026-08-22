@@ -80,3 +80,5 @@ jobs:
           git add cloudflare/adilio-career-assistant.js
           git commit -m 'Fix duplicate Worker declarations'
           git push origin HEAD:main
+
+# one-time trigger
