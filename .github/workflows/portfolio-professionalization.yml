@@ -74,14 +74,26 @@ jobs:
           grep -q 'AI ENGINEER | SENIOR DATA SCIENTIST' assets/cv_adilio_farias_en.html
           grep -q 'ENGENHEIRO DE IA | CIENTISTA DE DADOS SÊNIOR' assets/cv_adilio_farias_pt.html
 
+          grep -q "SERVICE_VERSION = '2026.10'" cloudflare/adilio-career-assistant.js
           grep -q 'removeCrossProjectClaims' cloudflare/adilio-career-assistant.js
+          grep -q 'containsReasoningLeak' cloudflare/adilio-career-assistant.js
+          grep -q 'containsPortfolioProfessionalMix' cloudflare/adilio-career-assistant.js
+          grep -q 'containsKnownPortfolioOverclaim' cloudflare/adilio-career-assistant.js
+          grep -q 'stripModelArtifacts' cloudflare/adilio-career-assistant.js
+          grep -q 'filterSourcesForReply' cloudflare/adilio-career-assistant.js
+          grep -q 'repairAnswer' cloudflare/adilio-career-assistant.js
           grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js
           grep -q 'openrouter/free' cloudflare/adilio-career-assistant.js
           grep -q 'openai/gpt-oss-20b:free' cloudflare/adilio-career-assistant.js
           grep -q 'nvidia/nemotron-nano-9b-v2:free' cloudflare/adilio-career-assistant.js
-          grep -q 'PUBLIC PORTFOLIO PROJECTS' cloudflare/adilio-career-assistant.js
           grep -q 'not a production security boundary' cloudflare/adilio-career-assistant.js
           grep -q '100% synthetic data' cloudflare/adilio-career-assistant.js
+          grep -q 'NEVER create a "Sources"' cloudflare/adilio-career-assistant.js
+          grep -q 'reasoning: { exclude: true }' cloudflare/adilio-career-assistant.js
+
+          grep -q '10/10 pass criteria' docs/RAG_EVAL_SUITE.md
+          grep -q 'thinking process' docs/RAG_EVAL_SUITE.md
+          grep -q 'employer metrics are never attached to portfolio projects' docs/RAG_EVAL_SUITE.md
 
       - name: Validate Worker JavaScript syntax
         run: node --check cloudflare/adilio-career-assistant.js
