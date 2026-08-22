@@ -131,3 +131,11 @@ When a canonical project README changes materially, rerun this suite before cons
 - DataSUS RAG Agent must not be called synthetic unless its canonical repository evidence explicitly changes.
 - Internal phrases such as `non-negotiable rule`, `rule states`, or evidence-selection mechanics must never reach the user.
 - A new explicit question must select repository evidence from the current question only; prior turns may support conversational continuity but must not contaminate retrieval for a different topic.
+
+## Response-completeness regressions
+
+- Recruiter-fit answers must never return a sentence fragment (for example, `Adilio ... brings 15+ years of`).
+- Explicit repeated questions are regenerated independently and do not receive previous answer text as generation context.
+- Successful fit/experience answers must contain substantive professional evidence and normally exceed the minimum completeness threshold.
+- If an answer is stripped at a model-generated Sources heading and becomes incomplete, it must be repaired or rejected.
+- Source fallback must never attach arbitrary portfolio repositories to an incomplete professional/combined response.
