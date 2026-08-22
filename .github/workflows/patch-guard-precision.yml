@@ -29,10 +29,14 @@ jobs:
         run: |
           cp cloudflare/adilio-career-assistant.js /tmp/adilio-career-assistant.mjs
           node --check /tmp/adilio-career-assistant.mjs
-          grep -q "SERVICE_VERSION = '2026.14'" cloudflare/adilio-career-assistant.js
+          grep -q "SERVICE_VERSION = '2026.15'" cloudflare/adilio-career-assistant.js
+          grep -q "const AI_ENGINEER_FIT = \['squad_forge_SE'\]" cloudflare/adilio-career-assistant.js
+          grep -q 'function isFitQuestion' cloudflare/adilio-career-assistant.js
+          grep -q 'if (isFitQuestion(question)) return AI_ENGINEER_FIT' cloudflare/adilio-career-assistant.js
+          grep -q 'Target 90-150 words' cloudflare/adilio-career-assistant.js
+          grep -q 'max_tokens: isFitQuestion(question) ? 1000 : 700' cloudflare/adilio-career-assistant.js
           grep -q 'function validationIssues' cloudflare/adilio-career-assistant.js
           grep -q 'guard_${repairIssues.join' cloudflare/adilio-career-assistant.js
-          grep -q 'production-grade rag' cloudflare/adilio-career-assistant.js
 
       - name: Commit Worker
         run: |
@@ -43,5 +47,5 @@ jobs:
             echo 'No changes to commit'
             exit 0
           fi
-          git commit -m 'Refine recruiter guard precision and diagnostics'
+          git commit -m 'Harden recruiter-fit response reliability'
           git push origin HEAD:main
