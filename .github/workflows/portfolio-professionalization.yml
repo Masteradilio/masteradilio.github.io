@@ -7,6 +7,8 @@ on:
     paths:
       - 'index.html'
       - 'assets/**'
+      - 'cloudflare/**'
+      - 'docs/RAG_EVAL_SUITE.md'
       - 'scripts/generate_social_card.py'
       - 'src/input.css'
       - 'robots.txt'
@@ -18,6 +20,8 @@ on:
     paths:
       - 'index.html'
       - 'assets/**'
+      - 'cloudflare/**'
+      - 'docs/RAG_EVAL_SUITE.md'
       - 'scripts/**'
       - 'src/input.css'
       - 'robots.txt'
@@ -48,6 +52,8 @@ jobs:
           test -s assets/portfolio-og.png
           test -s assets/cv_adilio_farias_en.html
           test -s assets/cv_adilio_farias_pt.html
+          test -s cloudflare/adilio-career-assistant.js
+          test -s docs/RAG_EVAL_SUITE.md
           test -s robots.txt
           test -s sitemap.xml
 
@@ -67,6 +73,18 @@ jobs:
           grep -q 'Featured • ML/MLOps' index.html
           grep -q 'AI ENGINEER | SENIOR DATA SCIENTIST' assets/cv_adilio_farias_en.html
           grep -q 'ENGENHEIRO DE IA | CIENTISTA DE DADOS SÊNIOR' assets/cv_adilio_farias_pt.html
+
+          grep -q 'removeCrossProjectClaims' cloudflare/adilio-career-assistant.js
+          grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js
+          grep -q 'openrouter/free' cloudflare/adilio-career-assistant.js
+          grep -q 'openai/gpt-oss-20b:free' cloudflare/adilio-career-assistant.js
+          grep -q 'nvidia/nemotron-nano-9b-v2:free' cloudflare/adilio-career-assistant.js
+          grep -q 'PUBLIC PORTFOLIO PROJECTS' cloudflare/adilio-career-assistant.js
+          grep -q 'not a production security boundary' cloudflare/adilio-career-assistant.js
+          grep -q '100% synthetic data' cloudflare/adilio-career-assistant.js
+
+      - name: Validate Worker JavaScript syntax
+        run: node --check cloudflare/adilio-career-assistant.js
 
       - name: Validate HTML structure and bilingual keys
         run: |
