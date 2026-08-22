@@ -91,3 +91,5 @@ jobs:
             git commit -m 'feat: finalize recruiter-facing portfolio evidence'
             git push origin HEAD:portfolio-professionalization-20260822
           fi
+
+# Trigger marker: base workflow is now available on main for PR validation.
