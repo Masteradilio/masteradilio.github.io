@@ -1,10 +1,10 @@
 ADILIO DE SOUSA FARIAS
-Cientista de Dados Sênior | Machine Learning | Fraude | Risco de Crédito | MLOps
+Engenheiro de IA | Cientista de Dados Sênior | Machine Learning | MLOps | IA Generativa
 Brasília/DF | Disponível para modelo híbrido em São Paulo e remoto
 LinkedIn: linkedin.com/in/adiliofarias | Email: adiliobb@gmail.com | GitHub: github.com/Masteradilio
 
 RESUMO PROFISSIONAL
-Cientista de Dados com mais de 15 anos de experiência no setor financeiro, combinando conhecimento de negócio bancário com Machine Learning aplicado à prevenção a fraudes e risco de crédito. Experiência no desenvolvimento e operacionalização de modelos de antifraude PIX e Probabilidade de Inadimplência, além de componentes de PD, LGD, EAD e EL/ECL aplicados à gestão de risco. Entregas recentes incluem modelo antifraude PIX com Recall de 97% e FPR inferior a 1%, pipeline semanal de MLOps para milhões de transações e modelo de risco de crédito aplicado a ~700 mil clientes.
+Engenheiro de IA e Cientista de Dados com mais de 15 anos de experiência no setor financeiro, combinando conhecimento de negócio bancário com Machine Learning aplicado à prevenção a fraudes e risco de crédito. Experiência no desenvolvimento e operacionalização de modelos de antifraude PIX e Probabilidade de Inadimplência, além de componentes de PD, LGD, EAD e EL/ECL aplicados à gestão de risco. Entregas recentes incluem modelo antifraude PIX com Recall de 97% e FPR inferior a 1%, pipeline semanal de MLOps para milhões de transações e modelo de risco de crédito aplicado a ~700 mil clientes.
 
 COMPETÊNCIAS-CHAVE
 - Data Science & Machine Learning: Python, SQL, Pandas, NumPy, Scikit-learn, PyTorch, modelagem estatística, feature engineering, validação de modelos, classificação, classes desbalanceadas, Deep Learning.
@@ -15,7 +15,7 @@ COMPETÊNCIAS-CHAVE
 
 EXPERIÊNCIA PROFISSIONAL
 1. BRB - Banco Regional de Brasília S.A. (jul/2025 - jul/2026)
-   Cientista de Dados e Machine Learning | Brasília/DF
+   Engenheiro de IA e Machine Learning | Brasília/DF
    - Liderei o desenvolvimento end-to-end de modelo de Machine Learning para prevenção a fraudes em transações PIX, alcançando Recall de 97% e FPR inferior a 1%.
    - Estruturei pipeline semanal de MLOps para milhões de transações, automatizando preparação de dados, treinamento, validação, geração de artefatos, monitoramento de drift e publicação de métricas.
    - Otimizei workflow crítico de processamento de dados, reduzindo o tempo de execução de mais de 2 horas para aproximadamente 24 minutos, ganho superior a 80%.
