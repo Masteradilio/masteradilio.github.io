@@ -15,163 +15,21 @@ jobs:
   patch-worker:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout target branch
+      - name: Checkout review branch
         uses: actions/checkout@v4
         with:
           ref: career-assistant-live-llm-only-20260822
           fetch-depth: 0
 
-      - name: Apply live-generation and factual-hardening patch
+      - name: Download patch script from main
         run: |
-          python - <<'PY'
-          from pathlib import Path
+          curl -fsSL https://raw.githubusercontent.com/Masteradilio/masteradilio.github.io/main/scripts/patch_live_llm_only.py -o /tmp/patch_live_llm_only.py
 
-          worker = Path('cloudflare/adilio-career-assistant.js')
-          text = worker.read_text(encoding='utf-8')
+      - name: Apply live-LLM hardening
+        run: |
+          python /tmp/patch_live_llm_only.py
 
-          text = text.replace('v2026.10: recruiter-facing RAG hardening.', 'v2026.11: live-LLM recruiter RAG hardening.')
-          text = text.replace('- resilient grounded fallbacks for critical recruiter questions', '- no substantive prewritten fallbacks; content answers always come from live LLM + RAG')
-          text = text.replace("const SERVICE_VERSION = '2026.10';", "const SERVICE_VERSION = '2026.11';")
-
-          # Current question controls retrieval. History is used only for genuinely vague follow-ups.
-          s = text.find('function selectRepos(question, history) {')
-          e = text.find('function sanitizeGithubPath(', s)
-          if s < 0 or e < 0:
-              raise SystemExit('selectRepos block not found')
-          new_select = r'''function selectRepos(question, history) {
-  const explicitCurrent = [...new Set(directRepoMentions(question))];
-  if (explicitCurrent.length) return explicitCurrent.slice(0, 3);
-
-  const q = normalizeText(question);
-  if (/\b(mlops|mlflow|model lifecycle|model monitoring|drift|feature store|production-oriented machine learning|production oriented machine learning)\b/.test(q)) return MLOPS_PORTFOLIO;
-  if (/\b(rag|retrieval|ai agents?|agentic|agentes? de ia|llm|langgraph|chromadb|bm25|ontology|guardrail)\b/.test(q)) return RAG_AGENT_PORTFOLIO;
-  if (/\b(credit|credito|pd|lgd|ead|ecl|ifrs|scorecard|scoring)\b/.test(q)) return ['credit_risk_model', 'credit_scoring_model'];
-  if (/\b(fraud|fraude|pix|anti-fraud|antifraude|redis|isolation forest)\b/.test(q)) return ['sentinel_pix'];
-  if (/\b(time series|forecast|series temporais|previsao|quantitative|bilstm|tcn)\b/.test(q)) return ['time_series_predict'];
-  if (/\b(ai engineer|engenheiro de ia|strongest|mais forte|best project|melhor projeto)\b/.test(q)) return AI_ENGINEER_FEATURED;
-
-  const vagueFollowUp = q.split(/\s+/).filter(Boolean).length <= 7 || /^(why|how|what about|and|e|por que|porque|como|e quanto)/.test(q);
-  if (vagueFollowUp) {
-    const historical = [...new Set(directRepoMentions(history.slice(-4).map(item => item.content).join(' ')))];
-    if (historical.length) return historical.slice(0, 3);
-  }
-
-  return AI_ENGINEER_FEATURED;
-}
-
-'''
-          text = text[:s] + new_select + text[e:]
-
-          # Remove all question-specific substantive fallback answers.
-          s = text.find('function localFallback(')
-          e = text.find('async function repairAnswer(', s)
-          if s < 0 or e < 0:
-              raise SystemExit('localFallback block not found')
-          unavailable = '''function unavailableReply(language) {
-  return language === 'pt'
-    ? 'O assistente de IA está temporariamente indisponível para gerar uma resposta confiável. Tente novamente em alguns instantes.'
-    : 'The AI assistant is temporarily unable to generate a reliable answer. Please try again in a few moments.';
-}
-
-'''
-          text = text[:s] + unavailable + text[e:]
-
-          old = """      if (!apiKey) {
-        const fallback = localFallback(question, language, plan, repos);
-        return jsonResponse(request, { reply: fallback, sources: filterSourcesForReply(fallback, candidateSources, plan, language), model_used: 'grounded-local-fallback', status: 'success', request_id: requestId });
-      }
-"""
-          new = """      if (!apiKey) {
-        const unavailable = unavailableReply(language);
-        return jsonResponse(request, { reply: unavailable, sources: [], model_used: null, generation_mode: 'unavailable', status: 'unavailable', request_id: requestId });
-      }
-"""
-          if old not in text:
-              raise SystemExit('api-key fallback block not found')
-          text = text.replace(old, new)
-          text = text.replace("reply = repaired?.reply || localFallback(question, language, plan, repos);", "reply = repaired?.reply || '';")
-
-          old_end = """      const fallback = localFallback(question, language, plan, repos);
-      return jsonResponse(request, { reply: fallback, sources: filterSourcesForReply(fallback, candidateSources, plan, language), model_used: 'grounded-local-fallback', status: 'success', request_id: requestId });
-"""
-          new_end = """      const unavailable = unavailableReply(language);
-      return jsonResponse(request, { reply: unavailable, sources: [], model_used: null, generation_mode: 'unavailable', status: 'unavailable', request_id: requestId });
-"""
-          if old_end not in text:
-              raise SystemExit('terminal fallback block not found')
-          text = text.replace(old_end, new_end)
-
-          # A failed repair in a tool-call path must try the next live model, not return an empty answer.
-          text = text.replace(
-              """              reply = repaired?.reply || '';
-            }
-            const allSources = dedupeSources([...candidateSources, ...toolSources]);""",
-              """              reply = repaired?.reply || '';
-            }
-            if (!reply) continue;
-            const allSources = dedupeSources([...candidateSources, ...toolSources]);"""
-          )
-
-          # Mark successful substantive answers explicitly as live LLM + RAG.
-          text = text.replace(
-              "model_used: model, status: 'success', tool_executed: true",
-              "model_used: model, generation_mode: 'llm-rag', status: 'success', tool_executed: true"
-          )
-          text = text.replace(
-              "model_used: model, status: 'success', tool_executed: false",
-              "model_used: model, generation_mode: 'llm-rag', status: 'success', tool_executed: false"
-          )
-
-          # Catch internal-rule leakage observed in live testing.
-          text = text.replace(
-              "'scratch work','chain of thought'];",
-              "'scratch work','chain of thought','non-negotiable rule','rule states','final-answer contract','evidence rules','available evidence blocks'];"
-          )
-
-          # Catch employer attribution errors and DataSUS synthetic overclaims before they reach recruiters.
-          needle = """function needsRepair(text, plan) {
-  return !text || text.length < 20 || containsReasoningLeak(text) || containsPortfolioProfessionalMix(text, plan) || containsKnownPortfolioOverclaim(text);
-}
-"""
-          replacement = """function containsProfessionalAttributionError(text) {
-  const q = normalizeText(text);
-  const pixAssignedToBancoDoBrasil = q.includes('banco do brasil') && (q.includes('pix') || q.includes('fraud-prevention model') || q.includes('fraud prevention model') || q.includes('97% recall'));
-  return pixAssignedToBancoDoBrasil;
-}
-
-function containsDataScopeOverclaim(text) {
-  const q = normalizeText(text);
-  return q.includes('datasus') && (q.includes('synthetic simulation') || q.includes('synthetic project') || q.includes('synthetic data'));
-}
-
-function needsRepair(text, plan) {
-  return !text || text.length < 20 || containsReasoningLeak(text) || containsPortfolioProfessionalMix(text, plan) || containsKnownPortfolioOverclaim(text) || containsProfessionalAttributionError(text) || containsDataScopeOverclaim(text);
-}
-"""
-          if needle not in text:
-              raise SystemExit('needsRepair block not found')
-          text = text.replace(needle, replacement)
-
-          if 'localFallback(' in text or 'grounded-local-fallback' in text:
-              raise SystemExit('prewritten substantive fallback remains')
-          worker.write_text(text, encoding='utf-8')
-
-          evals = Path('docs/RAG_EVAL_SUITE.md')
-          e = evals.read_text(encoding='utf-8')
-          e = e.replace('- free-tier model failure falls back to a grounded deterministic answer for critical recruiter questions.', '- substantive content answers are always generated by a live LLM with RAG context; model/provider failure returns an explicit unavailable state rather than a prewritten substantive answer.')
-          e = e.replace('- Do not fail if the first free model is unavailable.', '- Retry other configured live models if the first model is unavailable; never substitute a prewritten substantive answer.')
-          e = e.replace('- Free-tier degradation: critical recruiter questions should still return a grounded fallback within the frontend timeout.', '- Free-tier degradation: retry alternate live models; if none can produce a validated answer, return an explicit temporary-unavailable message within the frontend timeout.')
-          e += '\n\n## Live-generation regressions\n\n- Successful recruiter content answers must come from live LLM generation (`generation_mode: llm-rag`), never question-specific hard-coded templates.\n- The BRB PIX fraud model must never be attributed to Banco do Brasil.\n- A current MLOps question must not inherit repository selection from unrelated earlier turns.\n- DataSUS RAG Agent must not be called synthetic unless its canonical repository evidence explicitly changes.\n- Internal phrases such as `non-negotiable rule`, `rule states`, or evidence-selection mechanics must never reach the user.\n'
-          evals.write_text(e, encoding='utf-8')
-
-          ci = Path('.github/workflows/portfolio-professionalization.yml')
-          c = ci.read_text(encoding='utf-8')
-          c = c.replace("grep -q \"SERVICE_VERSION = '2026.10'\" cloudflare/adilio-career-assistant.js", "grep -q \"SERVICE_VERSION = '2026.11'\" cloudflare/adilio-career-assistant.js")
-          c = c.replace("          grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js\n", "          ! grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js\n          ! grep -q 'function localFallback' cloudflare/adilio-career-assistant.js\n          grep -q \"generation_mode: 'llm-rag'\" cloudflare/adilio-career-assistant.js\n          grep -q 'containsProfessionalAttributionError' cloudflare/adilio-career-assistant.js\n          grep -q 'containsDataScopeOverclaim' cloudflare/adilio-career-assistant.js\n          grep -q 'function unavailableReply' cloudflare/adilio-career-assistant.js\n")
-          ci.write_text(c, encoding='utf-8')
-          PY
-
-      - name: Validate patched Worker
+      - name: Validate Cloudflare Worker as ES module
         run: |
           cp cloudflare/adilio-career-assistant.js /tmp/adilio-career-assistant.mjs
           node --check /tmp/adilio-career-assistant.mjs
@@ -180,8 +38,11 @@ function needsRepair(text, plan) {
           ! grep -q 'function localFallback' cloudflare/adilio-career-assistant.js
           ! grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js
           grep -q "SERVICE_VERSION = '2026.11'" cloudflare/adilio-career-assistant.js
+          grep -q "generation_mode: 'llm-rag'" cloudflare/adilio-career-assistant.js
+          grep -q 'containsProfessionalAttributionError' cloudflare/adilio-career-assistant.js
+          grep -q 'containsDataScopeOverclaim' cloudflare/adilio-career-assistant.js
 
-      - name: Commit to review branch
+      - name: Commit patched files to review branch
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
