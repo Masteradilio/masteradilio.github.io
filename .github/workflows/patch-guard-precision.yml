@@ -22,23 +22,21 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Apply guard precision patch
+      - name: Apply Vercel free-tier patch
         run: python scripts/patch_recruiter_guard_precision.py
 
       - name: Validate Worker as ES module
         run: |
           cp cloudflare/adilio-career-assistant.js /tmp/adilio-career-assistant.mjs
           node --check /tmp/adilio-career-assistant.mjs
-          grep -q "SERVICE_VERSION = '2026.16'" cloudflare/adilio-career-assistant.js
-          grep -q "const AI_ENGINEER_FIT = \['squad_forge_SE'\]" cloudflare/adilio-career-assistant.js
-          grep -q 'function isFitQuestion' cloudflare/adilio-career-assistant.js
-          grep -q 'function missesExplicitTechnologyReference' cloudflare/adilio-career-assistant.js
-          grep -q 'technology_not_addressed' cloudflare/adilio-career-assistant.js
-          grep -q "q.includes('local-first')" cloudflare/adilio-career-assistant.js
-          grep -q 'ragAgentSummaryDeploymentUpgrade' cloudflare/adilio-career-assistant.js
-          grep -q 'Explicitly name Kubernetes in the answer' cloudflare/adilio-career-assistant.js
-          grep -q 'Answer the LlamaIndex question explicitly' cloudflare/adilio-career-assistant.js
-          grep -q 'Do not infer that an architecture lacks scalability' cloudflare/adilio-career-assistant.js
+          grep -q "SERVICE_VERSION = '2026.17'" cloudflare/adilio-career-assistant.js
+          grep -q "const VERCEL_PRIMARY_MODEL = 'poolside/laguna-s-2.1-free'" cloudflare/adilio-career-assistant.js
+          grep -q "inclusionai/ling-3.0-tiny-free" cloudflare/adilio-career-assistant.js
+          grep -q "inclusionai/ling-3.0-flash-free" cloudflare/adilio-career-assistant.js
+          grep -q 'function classifyProviderError' cloudflare/adilio-career-assistant.js
+          grep -q 'provider_403_free_credit_restricted' cloudflare/adilio-career-assistant.js
+          grep -q 'provider_403_customer_verification_required' cloudflare/adilio-career-assistant.js
+          grep -q 'provider_403_access_denied' cloudflare/adilio-career-assistant.js
 
       - name: Commit Worker
         run: |
@@ -49,5 +47,5 @@ jobs:
             echo 'No changes to commit'
             exit 0
           fi
-          git commit -m 'Finalize recruiter-facing factual precision'
+          git commit -m 'Route Vercel through dedicated free models'
           git push origin HEAD:main
