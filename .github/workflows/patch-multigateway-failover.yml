@@ -1,0 +1,61 @@
+name: Patch recruiter assistant multi-gateway failover
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/patch-multigateway-failover.yml'
+      - 'scripts/patch_multigateway_failover.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout review branch
+        uses: actions/checkout@v4
+        with:
+          ref: career-assistant-multigateway-20260822
+          fetch-depth: 0
+
+      - name: Load patch script from main
+        run: |
+          git fetch origin main
+          git show origin/main:scripts/patch_multigateway_failover.py > /tmp/patch_multigateway_failover.py
+          python -m py_compile /tmp/patch_multigateway_failover.py
+
+      - name: Apply multi-gateway hardening
+        run: python /tmp/patch_multigateway_failover.py
+
+      - name: Validate Worker as Cloudflare ES module
+        run: |
+          cp cloudflare/adilio-career-assistant.js /tmp/adilio-career-assistant.mjs
+          node --check /tmp/adilio-career-assistant.mjs
+          grep -q "SERVICE_VERSION = '2026.12'" cloudflare/adilio-career-assistant.js
+          grep -q 'VERCEL_AI_GATEWAY_API_KEY' cloudflare/adilio-career-assistant.js
+          grep -q 'OPENROUTER_API_KEY' cloudflare/adilio-career-assistant.js
+          grep -q 'HF_TOKEN' cloudflare/adilio-career-assistant.js
+          grep -q 'https://ai-gateway.vercel.sh/v1/chat/completions' cloudflare/adilio-career-assistant.js
+          grep -q 'https://openrouter.ai/api/v1/chat/completions' cloudflare/adilio-career-assistant.js
+          grep -q 'https://router.huggingface.co/v1/chat/completions' cloudflare/adilio-career-assistant.js
+          grep -q '^function gatewayRoute' cloudflare/adilio-career-assistant.js
+          grep -q '^async function callGateway' cloudflare/adilio-career-assistant.js
+          grep -q 'gateway_used' cloudflare/adilio-career-assistant.js
+          ! grep -q 'function localFallback' cloudflare/adilio-career-assistant.js
+          ! grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js
+
+      - name: Commit patched files to review branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add cloudflare/adilio-career-assistant.js docs/RAG_EVAL_SUITE.md
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+            exit 0
+          fi
+          git commit -m 'Add resilient multi-gateway LLM failover'
+          git push origin HEAD:career-assistant-multigateway-20260822
