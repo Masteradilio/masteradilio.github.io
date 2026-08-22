@@ -2,7 +2,7 @@ from pathlib import Path
 
 worker = Path('cloudflare/adilio-career-assistant.js')
 text = worker.read_text(encoding='utf-8')
-print('GUARD_PRECISION_PATCH_START')
+print('FIT_RELIABILITY_PATCH_START')
 
 
 def replace_between(src: str, start_marker: str, end_marker: str, replacement: str) -> str:
@@ -15,128 +15,129 @@ def replace_between(src: str, start_marker: str, end_marker: str, replacement: s
     return src[:start] + replacement.rstrip() + '\n\n' + src[end:]
 
 
-# Version / timeout updates are idempotent.
-text = text.replace('v2026.13: recruiter-grade multi-gateway resilience.', 'v2026.14: recruiter-grade guard precision and diagnostics.', 1)
-text = text.replace("const SERVICE_VERSION = '2026.13';", "const SERVICE_VERSION = '2026.14';", 1)
-text = text.replace("const GATEWAY_TIMEOUTS_MS = { vercel: 16000, openrouter: 14000, huggingface: 14000, repair: 9000 };", "const GATEWAY_TIMEOUTS_MS = { vercel: 16000, openrouter: 14000, huggingface: 14000, repair: 12000 };", 1)
+# Version.
+text = text.replace('v2026.14: recruiter-grade guard precision and diagnostics.', 'v2026.15: recruiter-fit context minimization and reliability.', 1)
+text = text.replace("const SERVICE_VERSION = '2026.14';", "const SERVICE_VERSION = '2026.15';", 1)
 
-rule12 = "12. For BANPARÁ RAG work, preserve the supported verb 'developed'; do not upgrade it to 'deployed' unless the professional evidence explicitly changes."
-rule14 = rule12 + "\n13. For the BRB PIX fraud model, preserve the supported wording 'led end-to-end development'; do not claim production deployment unless PROFESSIONAL EVIDENCE explicitly supports it.\n14. For rag_agent_datasus, do not call the RAG pipeline production-grade or production-ready unless its canonical README explicitly supports that wording."
-if "13. For the BRB PIX fraud model" not in text:
-    if rule12 not in text:
-        raise SystemExit('system rule anchor not found')
-    text = text.replace(rule12, rule14, 1)
+# Recruiter-fit questions need one inspectable portfolio proof, not three unrelated READMEs.
+featured = "const AI_ENGINEER_FEATURED = ['squad_forge_SE', 'rag_agent_datasus', 'sentinel_pix'];"
+fit_decl = featured + "\nconst AI_ENGINEER_FIT = ['squad_forge_SE'];"
+if 'const AI_ENGINEER_FIT' not in text:
+    if featured not in text:
+        raise SystemExit('AI_ENGINEER_FEATURED anchor not found')
+    text = text.replace(featured, fit_decl, 1)
 
-portfolio_block = r'''function containsKnownPortfolioOverclaim(text) {
-  const q = normalizeText(text);
-  const sentinelBad = q.includes('sentinel') && (
-    q.includes('deployed a real-time fraud') ||
-    q.includes("brazil's pix instant payment network") ||
-    q.includes('brazil’s pix instant payment network') ||
-    q.includes('97% recall') ||
-    q.includes('weekly mlops pipeline')
-  );
-
-  // Reject only affirmative claims that Squad Forge provides ML lifecycle/drift
-  // capabilities. Negative limitation statements remain valid.
-  const squadPositivePatterns = [
-    /squad forge.{0,140}\b(?:is|acts as|serves as|implements|includes|features|provides|supports|automates|manages)\b(?!\s+(?:not|no)\b).{0,90}\b(?:ml model lifecycle management|drift detection|model drift)\b/i,
-    /squad forge.{0,100}\b(?:ml model lifecycle management|drift detection|model drift)\b.{0,80}\b(?:capability|feature|platform|pipeline)\b/i,
-    /\b(?:ml model lifecycle management|drift detection|model drift)\b.{0,100}\b(?:implemented|provided|supported|automated)\b.{0,80}squad forge/i
-  ];
-  const squadBad = squadPositivePatterns.some(pattern => pattern.test(q));
-
-  const datasusBad = q.includes('datasus') && (
-    q.includes('deployed in public health') ||
-    q.includes('production-grade rag') ||
-    q.includes('production grade rag') ||
-    q.includes('production-ready rag') ||
-    q.includes('production ready rag')
-  );
-  const ontologyBad = q.includes('ontology rag guardrail') && q.includes('deployed') && q.includes('enterprise security');
-  return sentinelBad || squadBad || datasusBad || ontologyBad;
-}'''
-text = replace_between(text, 'function containsKnownPortfolioOverclaim(text) {', 'function containsProfessionalAttributionError(text) {', portfolio_block)
-
-attr_block = r'''function evidenceClauses(text) {
-  return normalizeText(text)
-    .split(/\n+|(?<=[.!?])\s+/)
-    .map(part => part.trim())
-    .filter(Boolean);
+# Stable semantic helper used by routing, prompting and validation.
+if 'function isFitQuestion(question)' not in text:
+    anchor = 'function classifyEvidencePlan(question) {'
+    helper = r'''function isFitQuestion(question) {
+  const q = normalizeText(question);
+  return /\b(interview|hire|hiring|fit|candidate|role|entrevista|contratar|vaga|candidato)\b/.test(q);
 }
 
-function hasDirectDeploymentUpgrade(clause, employerPattern, capabilityPattern) {
-  if (!employerPattern.test(clause)) return false;
-  if (/\b(?:not|never|without|no evidence (?:of|for))\b.{0,24}\bdeploy(?:ed|ment)?\b/i.test(clause)) return false;
-  const forward = new RegExp(`\\bdeploy(?:ed|ment)?\\b.{0,36}\\b(?:${capabilityPattern})\\b`, 'i');
-  const reverse = new RegExp(`\\b(?:${capabilityPattern})\\b.{0,36}\\bdeploy(?:ed|ment)?\\b`, 'i');
-  return forward.test(clause) || reverse.test(clause);
-}
+'''
+    if anchor not in text:
+        raise SystemExit('classifyEvidencePlan anchor not found')
+    text = text.replace(anchor, helper + anchor, 1)
 
-function containsProfessionalAttributionError(text) {
-  const clauses = evidenceClauses(text);
-  const bancoDoBrasilMetric = /\b(?:pix|fraud-prevention model|fraud prevention model|97% recall)\b/i;
-  const bancoMetricBad = clauses.some(clause => /\bbanco do brasil\b/i.test(clause) && bancoDoBrasilMetric.test(clause));
+# Make the classifier reuse the same fit definition.
+text = text.replace(
+    "  const asksFit = /\\b(interview|hire|hiring|fit|candidate|role|entrevista|contratar|vaga|candidato)\\b/.test(q);",
+    "  const asksFit = isFitQuestion(question);",
+    1
+)
 
-  const brbEmployer = /\b(?:brb|banco de brasilia)\b/i;
-  const banparaEmployer = /\bbanpara\b/i;
-  const llmRagAgent = 'llm|rag|ai-agent|ai agent';
+select_repos = r'''function selectRepos(question, history) {
+  const explicitCurrent = [...new Set(directRepoMentions(question))];
+  if (explicitCurrent.length) return explicitCurrent.slice(0, 3);
 
-  const brbLlmDeploymentUpgrade = clauses.some(clause => hasDirectDeploymentUpgrade(clause, brbEmployer, llmRagAgent));
-  const banparaRagDeploymentUpgrade = clauses.some(clause => hasDirectDeploymentUpgrade(clause, banparaEmployer, 'rag'));
-  const brbPixDeploymentUpgrade = clauses.some(clause =>
-    brbEmployer.test(clause) &&
-    /\bdeploy(?:ed|ment)?\b.{0,42}\b(?:pix|fraud(?:-prevention| prevention)? model)\b|\b(?:pix|fraud(?:-prevention| prevention)? model)\b.{0,42}\bdeploy(?:ed|ment)?\b/i.test(clause)
-  );
+  const q = normalizeText(question);
 
-  return bancoMetricBad || brbLlmDeploymentUpgrade || banparaRagDeploymentUpgrade || brbPixDeploymentUpgrade;
+  // Recruiter-fit questions are intentionally low-context: professional CV facts
+  // are primary and Squad Forge SE is the single supplemental portfolio proof.
+  // This reduces cross-project overclaim risk and improves completion reliability.
+  if (isFitQuestion(question)) return AI_ENGINEER_FIT;
+
+  if (/\b(mlops|mlflow|model lifecycle|model monitoring|drift|feature store|production-oriented machine learning|production oriented machine learning)\b/.test(q)) return MLOPS_PORTFOLIO;
+  if (/\b(rag|retrieval|ai agents?|agentic|agentes? de ia|llm|langgraph|chromadb|bm25|ontology|guardrail)\b/.test(q)) return RAG_AGENT_PORTFOLIO;
+  if (/\b(credit|credito|pd|lgd|ead|ecl|ifrs|scorecard|scoring)\b/.test(q)) return ['credit_risk_model', 'credit_scoring_model'];
+  if (/\b(fraud|fraude|pix|anti-fraud|antifraude|redis|isolation forest)\b/.test(q)) return ['sentinel_pix'];
+  if (/\b(time series|forecast|series temporais|previsao|quantitative|bilstm|tcn)\b/.test(q)) return ['time_series_predict'];
+  if (/\b(ai engineer|engenheiro de ia|strongest|mais forte|best project|melhor projeto)\b/.test(q)) return AI_ENGINEER_FEATURED;
+
+  const words = q.split(/\s+/).filter(Boolean);
+  const vagueFollowUp = words.length <= 7 && /^(why|how|what about|and|e|por que|porque|como|e quanto)\b/.test(q);
+  if (vagueFollowUp) {
+    const historical = [...new Set(directRepoMentions(history.slice(-4).map(item => item.content).join(' ')))];
+    if (historical.length) return historical.slice(0, 3);
+  }
+
+  return AI_ENGINEER_FEATURED;
 }'''
-text = replace_between(text, 'function containsProfessionalAttributionError(text) {', 'function containsDataScopeOverclaim(text) {', attr_block)
+text = replace_between(text, 'function selectRepos(question, history) {', 'function sanitizeGithubPath(path) {', select_repos)
 
-validation_block = r'''function validationIssues(text, plan, question) {
-  const issues = [];
-  if (looksIncompleteAnswer(text, question, plan)) issues.push('incomplete');
-  if (containsReasoningLeak(text)) issues.push('reasoning_leak');
-  if (containsPortfolioProfessionalMix(text, plan)) issues.push('portfolio_professional_mix');
-  if (containsKnownPortfolioOverclaim(text)) issues.push('portfolio_overclaim');
-  if (containsProfessionalAttributionError(text)) issues.push('professional_attribution');
-  if (containsDataScopeOverclaim(text)) issues.push('data_scope');
-  if (missesRequiredProfessionalLead(text, plan, question)) issues.push('professional_lead_missing');
-  return issues;
-}
+plan_instruction = r'''function evidencePlanInstruction(plan, question) {
+  const q = normalizeText(question);
+  const lines = [];
+  if (plan.mode === 'professional') lines.push('For this question, use PROFESSIONAL EVIDENCE only. Do not introduce portfolio-project claims unless the user explicitly asks for them.');
+  else if (plan.mode === 'portfolio') {
+    lines.push('For this question, use PORTFOLIO EVIDENCE only. Do not use employer metrics, employer names or professional achievements to describe the portfolio projects.');
+    lines.push('A portfolio project can be production-oriented in architecture without being deployed in an employer production environment. Preserve that distinction explicitly when relevant.');
+  } else lines.push('For this question, lead with PROFESSIONAL EVIDENCE, then use PORTFOLIO EVIDENCE as additional proof. Phrase the boundary clearly.');
 
-function needsRepair(text, plan, question) {
-  return validationIssues(text, plan, question).length > 0;
+  if (isFitQuestion(question)) {
+    lines.push('This is a recruiter-fit question. Start with a direct hiring recommendation grounded in PROFESSIONAL EVIDENCE. Use 2-4 of the strongest professional facts, then at most one short paragraph or bullet about Squad Forge SE as supplemental inspectable portfolio evidence.');
+    lines.push('Target 90-150 words. Do not mention unrelated portfolio repositories. Do not turn portfolio architecture into employer production experience.');
+  }
+  if (/\b(experience|experiencia|evidence shows|evidencia)\b/.test(q)) lines.push('Because the user asks about experience/evidence, present professional evidence first and portfolio demonstrations second.');
+  if (/\b(mlops|production-oriented machine learning|production oriented machine learning)\b/.test(q)) {
+    lines.push('For portfolio MLOps, Sentinel-PIX may be described from its own README as a portfolio demonstration with synthetic simulation/customer data, FastAPI, Redis/PostgreSQL feature stores, MLflow, SHAP and drift monitoring. Do not attach BRB metrics to Sentinel-PIX.');
+    lines.push('Squad Forge SE is an autonomous software-engineering control plane; do not describe it as an ML model lifecycle or drift-monitoring platform unless its own evidence says so.');
+  }
+  if (/\bkubernetes\b/.test(q)) lines.push('If Kubernetes is not explicitly present in canonical project evidence, answer with insufficient evidence. Docker, FastAPI, MLOps or AWS do not imply Kubernetes.');
+  return lines.join('\n');
 }'''
-text = replace_between(text, 'function needsRepair(text, plan, question) {', 'function gatewayCredentials(env) {', validation_block)
+text = replace_between(text, 'function evidencePlanInstruction(plan, question) {', 'function dedupeSources(sources) {', plan_instruction)
 
-old_repair = """    const repaired = stripModelArtifacts(response.data?.choices?.[0]?.message?.content);\n    const finishReason = response.data?.choices?.[0]?.finish_reason;\n    if (!repaired || finishReason === 'length' || needsRepair(repaired, plan, question)) continue;\n\n    return {\n"""
-new_repair = """    const repaired = stripModelArtifacts(response.data?.choices?.[0]?.message?.content);\n    const finishReason = response.data?.choices?.[0]?.finish_reason;\n    const repairIssues = repaired ? validationIssues(repaired, plan, question) : ['empty_answer'];\n    if (finishReason === 'length') repairIssues.unshift('finish_length');\n    attempts.push({ stage: 'validate-repair', gateway: candidate.gateway, ok: repairIssues.length === 0, status: response.status || 200, error: repairIssues.length ? `guard_${repairIssues.join('+')}` : null });\n    if (repairIssues.length) continue;\n\n    return {\n"""
-if old_repair in text:
-    text = text.replace(old_repair, new_repair, 1)
-elif 'stage: \'validate-repair\'' not in text:
-    raise SystemExit('repair validation anchor not found')
+lead_guard = r'''function missesRequiredProfessionalLead(text, plan, question) {
+  if (plan.mode !== 'combined') return false;
+  const q = normalizeText(question);
+  if (!isFitQuestion(question) && !/\b(experience|evidence shows|background|experiencia|evidencia|historico)\b/.test(q)) return false;
 
-old_normal = """        let reply = stripModelArtifacts(modelMessage.content);\n        const finishReason = response.data?.choices?.[0]?.finish_reason;\n        let servedGateway = candidate.gateway;\n        let servedModel = response.data?.model || candidate.model;\n        if (finishReason === 'length' || needsRepair(reply, plan, question)) {\n"""
-new_normal = """        let reply = stripModelArtifacts(modelMessage.content);\n        const finishReason = response.data?.choices?.[0]?.finish_reason;\n        let servedGateway = candidate.gateway;\n        let servedModel = response.data?.model || candidate.model;\n        const generationIssues = reply ? validationIssues(reply, plan, question) : ['empty_answer'];\n        if (finishReason === 'length') generationIssues.unshift('finish_length');\n        attempts.push({ stage: 'validate', gateway: candidate.gateway, ok: generationIssues.length === 0, status: response.status || 200, error: generationIssues.length ? `guard_${generationIssues.join('+')}` : null });\n        if (generationIssues.length) {\n"""
-if old_normal in text:
-    text = text.replace(old_normal, new_normal, 1)
-elif "stage: 'validate'" not in text:
-    raise SystemExit('normal validation anchor not found')
+  const answer = normalizeText(text);
+  const hasEmployerOrDomain = /\b(?:brb|banco de brasilia|banpara|financial[- ]services|banking|setor financeiro)\b/.test(answer);
+  const hasTenure = /\b(?:15\+?\s*years|over\s+15\s+years|more\s+than\s+15\s+years|15\s+anos)\b/.test(answer);
+  const hasProfessionalLabel = /\b(?:professional experience|professional evidence|experiencia profissional|aws certified|msc)\b/.test(answer);
+  return !(hasEmployerOrDomain || hasTenure || hasProfessionalLabel);
+}'''
+text = replace_between(text, 'function missesRequiredProfessionalLead(text, plan, question) {', 'function validationIssues(text, plan, question) {', lead_guard)
 
-old_tool = """            let reply = stripModelArtifacts(follow.data?.choices?.[0]?.message?.content);\n            const finishReason = follow.data?.choices?.[0]?.finish_reason;\n            let servedGateway = candidate.gateway;\n            let servedModel = follow.data?.model || candidate.model;\n            if (finishReason === 'length' || needsRepair(reply, plan, question)) {\n"""
-new_tool = """            let reply = stripModelArtifacts(follow.data?.choices?.[0]?.message?.content);\n            const finishReason = follow.data?.choices?.[0]?.finish_reason;\n            let servedGateway = candidate.gateway;\n            let servedModel = follow.data?.model || candidate.model;\n            const toolIssues = reply ? validationIssues(reply, plan, question) : ['empty_answer'];\n            if (finishReason === 'length') toolIssues.unshift('finish_length');\n            attempts.push({ stage: 'validate-tool', gateway: candidate.gateway, ok: toolIssues.length === 0, status: follow.status || 200, error: toolIssues.length ? `guard_${toolIssues.join('+')}` : null });\n            if (toolIssues.length) {\n"""
-if old_tool in text:
-    text = text.replace(old_tool, new_tool, 1)
-elif "stage: 'validate-tool'" not in text:
-    raise SystemExit('tool validation anchor not found')
+# Fit repairs get a focused contract and enough token budget for reasoning-model providers.
+text = text.replace(
+    "  const limitationsQuestion = /\\b(limitations?|limitações|limitacoes)\\b/.test(q);",
+    "  const limitationsQuestion = /\\b(limitations?|limitações|limitacoes)\\b/.test(q);\n  const fitQuestion = isFitQuestion(question);",
+    1
+)
+focus_anchor = "  if (limitationsQuestion) {\n    focusRules.push('Answer with the project name and 2-4 concrete limitations supported by its canonical evidence. Distinguish portfolio/local-first evidence from employer production deployment.');\n    focusRules.push('Target 60-140 words.');\n  }"
+focus_replacement = focus_anchor + "\n  if (fitQuestion) {\n    focusRules.push('This is a recruiter-fit answer. Lead with professional evidence and a direct recommendation. Use only the strongest 2-4 professional facts and, if useful, one concise Squad Forge SE portfolio point.');\n    focusRules.push('Target 90-150 words. Do not mention DataSUS, Sentinel-PIX or other unrelated repositories for this fit answer.');\n  }"
+if "Do not mention DataSUS, Sentinel-PIX" not in text:
+    if focus_anchor not in text:
+        raise SystemExit('fit repair focus anchor not found')
+    text = text.replace(focus_anchor, focus_replacement, 1)
 
-old_wording = "Keep wording factual. For BRB LLM/RAG/AI-agent work, use implemented rather than deployed. For BANPARÁ RAG work, use developed rather than deployed."
-extra_wording = old_wording + " For the BRB PIX fraud model, say that Adilio led end-to-end development rather than claiming deployment. Do not describe rag_agent_datasus as production-grade/production-ready RAG unless its canonical evidence says so."
-if extra_wording not in text:
-    if old_wording not in text:
-        raise SystemExit('repair wording anchor not found')
-    text = text.replace(old_wording, extra_wording, 1)
+text = text.replace(
+    "{ messages: repairMessages, temperature: 0, max_tokens: abstentionQuestion ? 260 : 520 },",
+    "{ messages: repairMessages, temperature: 0, max_tokens: abstentionQuestion ? 260 : (fitQuestion ? 1100 : 520) },",
+    1
+)
+
+# Initial fit generation also gets additional room so reasoning-model providers do
+# not consume the whole completion budget before emitting the final answer.
+text = text.replace(
+    "        const payload = { messages, temperature: 0.1, max_tokens: 700 };",
+    "        const payload = { messages, temperature: 0.1, max_tokens: isFitQuestion(question) ? 1000 : 700 };",
+    1
+)
 
 worker.write_text(text, encoding='utf-8')
-print('GUARD_PRECISION_PATCH_COMPLETE')
+print('FIT_RELIABILITY_PATCH_COMPLETE')
