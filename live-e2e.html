@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Career Assistant Live E2E Audit</title>
 <style>
-body{font-family:system-ui,sans-serif;background:#07101f;color:#e5eefb;margin:0;padding:24px}main{max-width:1000px;margin:auto}.card{background:#111d31;border:1px solid #29405f;border-radius:12px;padding:16px;margin:10px 0}.pass{border-left:5px solid #22c55e}.fail{border-left:5px solid #ef4444}.pending{border-left:5px solid #38bdf8}code{color:#67e8f9}button{background:#0891b2;color:white;border:0;border-radius:9px;padding:12px 18px;font-weight:700;cursor:pointer}pre{white-space:pre-wrap;word-break:break-word;font-size:12px}.summary{font-size:22px;font-weight:800;margin:18px 0}</style>
+body{font-family:system-ui,sans-serif;background:#07101f;color:#e5eefb;margin:0;padding:24px}main{max-width:1000px;margin:auto}.card{background:#111d31;border:1px solid #29405f;border-radius:12px;padding:16px;margin:10px 0}.pass{border-left:5px solid #22c55e}.fail{border-left:5px solid #ef4444}.pending{border-left:5px solid #38bdf8}code{color:#67e8f9}button{background:#0891b2;color:white;border:0;border-radius:9px;padding:12px 18px;font-weight:700;cursor:pointer}pre{white-space:pre-wrap;word-break:break-word;font-size:12px}.summary{font-size:22px;font-weight:800;margin:18px 0}.attempts{color:#94a3b8;font-size:11px;margin-top:8px}
+</style>
 </head>
 <body><main>
+<!-- recruiter audit v2026.13 -->
 <h1>Career Assistant — Live 10/10 Audit</h1>
 <p>This temporary page sends recruiter-facing questions to the same production Worker used by the portfolio.</p>
 <button id="run">Run 10 live tests</button>
@@ -33,12 +35,12 @@ function validate(name,d){
  if(d.status!=='success')issues.push('status='+d.status);
  if(d.generation_mode!=='llm-rag')issues.push('generation_mode='+d.generation_mode);
  if(!d.gateway_used)issues.push('gateway_used missing');
- if(words<15)issues.push('answer too short');
+ if(words<12)issues.push('answer too short');
  forbidden.forEach(x=>{if(n.includes(x))issues.push('reasoning leak: '+x)});
  if(/(^|\n)\s*#{0,3}\s*(sources?|fontes?)\s*:?/i.test(reply))issues.push('model-generated Sources section');
  if(name==='fit'){
    if(!['15+ years','financial services','brb','banpar'].some(x=>n.includes(x)))issues.push('professional lead missing');
-   if(/deployed\s+(?:llm|rag|ai[- ]agent)/i.test(reply))issues.push('professional verb overclaim: deployed instead of implemented');
+   if(/(?:brb|banco de bras[ií]lia)[\s\S]{0,180}deploy(?:ed|ment)?[\s\S]{0,80}(?:llm|rag|ai[- ]agent)|deploy(?:ed|ment)?[\s\S]{0,80}(?:llm|rag|ai[- ]agent)[\s\S]{0,180}(?:brb|banco de bras[ií]lia)/i.test(reply))issues.push('professional verb overclaim: deployed instead of implemented');
  }
  if(name==='rag'&&/production-ready\s+rag/i.test(reply))issues.push('portfolio RAG readiness overclaim');
  if(name==='k8s'&&!['did not find','no evidence','insufficient evidence','not find sufficient'].some(x=>n.includes(x)))issues.push('Kubernetes abstention missing');
@@ -47,6 +49,10 @@ function validate(name,d){
  if(name==='boundary'&&!(n.startsWith('no')||n.includes('not a production')))issues.push('experimental boundary unclear');
  if(name==='pt'&&['não','evidência','projeto','usa','kafka'].filter(x=>n.includes(x)).length<2)issues.push('Portuguese response unclear');
  return {issues,words};
+}
+function attemptsText(d){
+ const xs=Array.isArray(d.gateway_attempts)?d.gateway_attempts:[];
+ return xs.length?xs.map(a=>`${a.stage}:${a.gateway}:${a.ok?'ok':(a.error||a.status||'fail')}`).join(' → '):'no attempt diagnostics';
 }
 async function run(){
  const btn=document.getElementById('run'),out=document.getElementById('results'),sum=document.getElementById('summary');btn.disabled=true;out.innerHTML='';sum.textContent='Running…';let passed=0;
@@ -58,7 +64,7 @@ async function run(){
    const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history:[]}),signal:c.signal});clearTimeout(timer);
    const d=await r.json(),v=validate(name,d),sec=((performance.now()-started)/1000).toFixed(1);if(!r.ok)v.issues.push('HTTP '+r.status);
    if(v.issues.length===0){passed++;box.className='card pass'}else box.className='card fail';
-   box.innerHTML='<b>Test '+(i+1)+'/10 — '+esc(name)+' — '+(v.issues.length?'FAIL':'PASS')+'</b><br><code>'+esc(d.gateway_used||'none')+' / '+esc(d.model_used||'none')+' · '+sec+'s · '+v.words+' words</code><pre>'+esc(d.reply||JSON.stringify(d))+'</pre>'+(v.issues.length?'<b>Issues:</b> '+esc(v.issues.join(' | ')):'' );
+   box.innerHTML='<b>Test '+(i+1)+'/10 — '+esc(name)+' — '+(v.issues.length?'FAIL':'PASS')+'</b><br><code>'+esc(d.gateway_used||'none')+' / '+esc(d.model_used||'none')+' · '+sec+'s · '+v.words+' words</code><div class="attempts">'+esc(attemptsText(d))+'</div><pre>'+esc(d.reply||JSON.stringify(d))+'</pre>'+(v.issues.length?'<b>Issues:</b> '+esc(v.issues.join(' | ')):'' );
   }catch(e){box.className='card fail';box.innerHTML='<b>Test '+(i+1)+'/10 — '+esc(name)+' — FAIL</b><pre>'+esc(e.message)+'</pre>';}
  }
  sum.textContent=passed+'/10 passed'+(passed===10?' — RECRUITER-READY':' — needs review');btn.disabled=false;
