@@ -7,6 +7,7 @@ on:
     paths:
       - 'index.html'
       - 'scripts/patch_portfolio.py'
+      - 'scripts/patch_portfolio_v2.py'
       - 'scripts/generate_social_card.py'
       - 'src/input.css'
       - '.github/workflows/portfolio-professionalization.yml'
@@ -16,6 +17,7 @@ on:
     paths:
       - 'index.html'
       - 'scripts/patch_portfolio.py'
+      - 'scripts/patch_portfolio_v2.py'
       - 'scripts/generate_social_card.py'
       - 'src/input.css'
       - '.github/workflows/portfolio-professionalization.yml'
@@ -41,7 +43,9 @@ jobs:
           python-version: '3.12'
 
       - name: Apply recruiter and security improvements
-        run: python scripts/patch_portfolio.py
+        run: |
+          python scripts/patch_portfolio.py
+          python scripts/patch_portfolio_v2.py
 
       - name: Build production Tailwind CSS
         run: npx --yes tailwindcss@3.4.17 -i ./src/input.css -o ./assets/tailwind.css --minify --content './index.html'
@@ -56,10 +60,13 @@ jobs:
           test -s assets/tailwind.css
           test -s assets/portfolio-og.png
           ! grep -q 'cdn.tailwindcss.com' index.html
+          ! grep -q '<code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B)' index.html
           grep -q 'DOMPurify.sanitize' index.html
           grep -q 'property="og:title"' index.html
           grep -q 'conversationHistory.slice(0, -1).slice(-4)' index.html
           grep -q 'if (!faq.utility) continue;' index.html
+          grep -q 'data-i18n="seniority_badge"' index.html
+          grep -q 'LightGBM + Isolation Forest' index.html
 
       - name: Commit generated portfolio update
         run: |
@@ -69,6 +76,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No generated changes to commit.'
           else
-            git commit -m 'feat: professionalize recruiter-facing portfolio'
+            git commit -m 'feat: align portfolio with current project evidence'
             git push origin HEAD:portfolio-professionalization-20260822
           fi
