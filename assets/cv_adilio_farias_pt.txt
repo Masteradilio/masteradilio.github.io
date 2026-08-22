@@ -4,7 +4,7 @@ Brasília/DF | Disponível para modelo híbrido em São Paulo e remoto
 LinkedIn: linkedin.com/in/adiliofarias | Email: adiliobb@gmail.com | GitHub: github.com/Masteradilio
 
 RESUMO PROFISSIONAL
-Engenheiro de IA e Cientista de Dados com mais de 15 anos de experiência no setor financeiro, combinando conhecimento de negócio bancário com Machine Learning aplicado à prevenção a fraudes e risco de crédito. Experiência no desenvolvimento e operacionalização de modelos de antifraude PIX e Probabilidade de Inadimplência, além de componentes de PD, LGD, EAD e EL/ECL aplicados à gestão de risco. Entregas recentes incluem modelo antifraude PIX com Recall de 97% e FPR inferior a 1%, pipeline semanal de MLOps para milhões de transações e modelo de risco de crédito aplicado a ~700 mil clientes.
+Engenheiro de IA e Engenheiro de IA e Cientista de Dados com mais de 15 anos de experiência no setor financeiro, combinando conhecimento de negócio bancário com Machine Learning aplicado à prevenção a fraudes e risco de crédito. Experiência no desenvolvimento e operacionalização de modelos de antifraude PIX e Probabilidade de Inadimplência, além de componentes de PD, LGD, EAD e EL/ECL aplicados à gestão de risco. Entregas recentes incluem modelo antifraude PIX com Recall de 97% e FPR inferior a 1%, pipeline semanal de MLOps para milhões de transações e modelo de risco de crédito aplicado a ~700 mil clientes.
 
 COMPETÊNCIAS-CHAVE
 - Data Science & Machine Learning: Python, SQL, Pandas, NumPy, Scikit-learn, PyTorch, modelagem estatística, feature engineering, validação de modelos, classificação, classes desbalanceadas, Deep Learning.
