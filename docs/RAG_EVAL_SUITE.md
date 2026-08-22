@@ -139,3 +139,14 @@ When a canonical project README changes materially, rerun this suite before cons
 - Successful fit/experience answers must contain substantive professional evidence and normally exceed the minimum completeness threshold.
 - If an answer is stripped at a model-generated Sources heading and becomes incomplete, it must be repaired or rejected.
 - Source fallback must never attach arbitrary portfolio repositories to an incomplete professional/combined response.
+
+## Multi-gateway resilience
+
+- Primary inference path: Vercel AI Gateway, with provider routing plus model fallbacks.
+- Secondary path: OpenRouter (`openrouter/free` by default).
+- Tertiary path: Hugging Face Inference Providers (`provider auto` / `:fastest`).
+- A transport/provider failure must advance to the next independent gateway.
+- An invalid or truncated answer must never be shown merely because a provider returned HTTP 200.
+- Successful content responses must remain live `llm-rag`; no substantive canned response may be introduced.
+- Successful responses must expose `gateway_used` and `model_used` internally for diagnostics without rendering routing details to recruiters.
+- Final `unavailable` is acceptable only after all configured independent gateways fail or return answers rejected by the deterministic gates.
