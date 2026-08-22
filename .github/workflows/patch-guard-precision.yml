@@ -1,0 +1,47 @@
+name: Patch recruiter guard precision
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/patch-guard-precision.yml'
+      - 'scripts/patch_recruiter_guard_precision.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply guard precision patch
+        run: python scripts/patch_recruiter_guard_precision.py
+
+      - name: Validate Worker as ES module
+        run: |
+          cp cloudflare/adilio-career-assistant.js /tmp/adilio-career-assistant.mjs
+          node --check /tmp/adilio-career-assistant.mjs
+          grep -q "SERVICE_VERSION = '2026.14'" cloudflare/adilio-career-assistant.js
+          grep -q 'function validationIssues' cloudflare/adilio-career-assistant.js
+          grep -q 'guard_${repairIssues.join' cloudflare/adilio-career-assistant.js
+          grep -q 'production-grade rag' cloudflare/adilio-career-assistant.js
+
+      - name: Commit Worker
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add cloudflare/adilio-career-assistant.js
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+            exit 0
+          fi
+          git commit -m 'Refine recruiter guard precision and diagnostics'
+          git push origin HEAD:main
