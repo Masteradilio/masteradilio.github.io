@@ -36,12 +36,16 @@ function validate(name,d){
  if(words<15)issues.push('answer too short');
  forbidden.forEach(x=>{if(n.includes(x))issues.push('reasoning leak: '+x)});
  if(/(^|\n)\s*#{0,3}\s*(sources?|fontes?)\s*:?/i.test(reply))issues.push('model-generated Sources section');
- if(name==='fit'&&!['15+ years','financial services','brb','banpar'].some(x=>n.includes(x)))issues.push('professional lead missing');
+ if(name==='fit'){
+   if(!['15+ years','financial services','brb','banpar'].some(x=>n.includes(x)))issues.push('professional lead missing');
+   if(/deployed\s+(?:llm|rag|ai[- ]agent)/i.test(reply))issues.push('professional verb overclaim: deployed instead of implemented');
+ }
+ if(name==='rag'&&/production-ready\s+rag/i.test(reply))issues.push('portfolio RAG readiness overclaim');
  if(name==='k8s'&&!['did not find','no evidence','insufficient evidence','not find sufficient'].some(x=>n.includes(x)))issues.push('Kubernetes abstention missing');
  if(name==='llama'&&!n.includes('llamaindex'))issues.push('LlamaIndex not addressed');
  if(name==='kafka'&&!n.includes('kafka'))issues.push('Kafka not addressed');
  if(name==='boundary'&&!(n.startsWith('no')||n.includes('not a production')))issues.push('experimental boundary unclear');
- if(name==='pt'&&![ 'não','evidência','projeto','usa','kafka'].filter(x=>n.includes(x)).length>=2)issues.push('Portuguese response unclear');
+ if(name==='pt'&&['não','evidência','projeto','usa','kafka'].filter(x=>n.includes(x)).length<2)issues.push('Portuguese response unclear');
  return {issues,words};
 }
 async function run(){
