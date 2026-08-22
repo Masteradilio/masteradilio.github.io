@@ -162,7 +162,7 @@
                 <p class="text-[11px] text-slate-400 font-mono" data-i18n="seniority_card_subtitle">Carreira multidisciplinar com períodos sobrepostos</p>
               </div>
             </div>
-            <span class="text-[10px] px-2.5 py-1 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 font-mono font-semibold">16+ anos no setor financeiro</span>
+            <span class="text-[10px] px-2.5 py-1 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 font-mono font-semibold" data-i18n="seniority_badge">16+ anos no setor financeiro</span>
           </div>
 
           <div class="space-y-2 text-xs font-mono">
@@ -389,10 +389,10 @@
             </div>
             <div class="flex flex-wrap gap-1.5 pt-1">
               <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Python</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">LightGBM</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">XGBoost</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Optuna</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">SHAP</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">FastAPI</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">IFRS 9</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">PD/LGD/EAD</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">EL/ECL</span>
             </div>
           </div>
           <div class="pt-5 mt-4 border-t border-slate-800 flex items-center justify-between text-xs">
@@ -442,17 +442,17 @@
             </div>
             <h3 class="text-lg sm:text-xl font-bold text-white">sentinel_pix</h3>
             <p class="text-xs text-slate-300 leading-relaxed" data-i18n="proj7_desc">
-              Sistema de detecção de fraudes e anomalias em transações PIX em tempo real com processamento de streams (Kafka), inferência assíncrona com XGBoost e latência rigorosa sub-50ms para autorização de pagamentos.
+              Motor antifraude PIX em tempo real com FastAPI, feature stores Redis/PostgreSQL, LightGBM + Isolation Forest, explicabilidade SHAP, MLflow e monitoramento contínuo de drift, com p95 inferior a 15 ms no benchmark do projeto.
             </p>
             <div class="space-y-1.5 text-[11px] font-mono text-slate-400 bg-slate-900/60 p-2.5 rounded-lg">
               <div><strong class="text-emerald-300">Destaque:</strong> Recall 99,86% • FPR 0,957% • p95 < 15 ms</div>
             </div>
             <div class="flex flex-wrap gap-1.5 pt-1">
               <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Python</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">XGBoost</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Kafka</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">FastAPI</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">LightGBM</span>
               <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Redis</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">FastAPI</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">MLflow</span>
             </div>
           </div>
           <div class="pt-5 mt-4 border-t border-slate-800 flex items-center justify-between text-xs">
@@ -476,7 +476,7 @@
             </div>
             <div>
               <h2 class="text-xl sm:text-2xl font-extrabold text-white" data-i18n="forge_section_title">
-                Como o Squad Forge SE Criou Este Site de Forma 100% Autônoma
+                Como o Squad Forge SE Implementou Este Portfólio
               </h2>
               <p class="text-xs sm:text-sm text-emerald-400 font-mono" data-i18n="forge_section_subtitle">
                 Pipeline determinístico de engenharia autônoma com modelo local (llama.cpp / qwen3.8-27b a $0.00 de custo)
@@ -489,7 +489,7 @@
         </div>
 
         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" data-i18n="forge_process_intro">
-          Este portfólio foi especificado por Adilio Farias por meio de um <strong>PRD (Product Requirements Document)</strong>, critérios de aceite e contratos de engenharia, e então implementado pelo <strong>Squad Forge SE</strong> — seu Control Plane Open-Source de Engenharia de Software autônoma. A inferência de ponta a ponta utilizou o servidor local <code>llama.cpp</code> com o modelo <code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B) com <strong>custo de nuvem de $0.00 USD</strong>.
+          Este portfólio foi especificado por Adilio Farias por meio de um <strong>PRD (Product Requirements Document)</strong>, critérios de aceite e contratos de engenharia, e então implementado pelo <strong>Squad Forge SE</strong> — seu Control Plane Open-Source de Engenharia de Software autônoma. A inferência de ponta a ponta utilizou o servidor local <code>llama.cpp</code> com o modelo <code>qwen3.8-27b</code> (Qwen3.8 27B) com <strong>custo de nuvem de $0.00 USD</strong>.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -741,6 +741,7 @@
         acad_pos_inst: "Data Science Academy",
         seniority_card_title: "Experiência Profissional Acumulada",
         seniority_card_subtitle: "Carreira multidisciplinar com períodos sobrepostos",
+        seniority_badge: "16+ anos no setor financeiro",
         role_ds: "Cientista de Dados",
         role_ds_time: "3+ anos de atuação",
         role_ai_eng: "Engenheiro de IA/ML",
@@ -759,9 +760,9 @@
         about_p1: "Olá! Sou o <strong>Adilio Farias</strong>, <strong>Engenheiro de IA/ML e Cientista de Dados</strong> com 16 anos de experiência no setor financeiro, combinando conhecimento de negócio bancário com atuação em Machine Learning, prevenção a fraudes e risco de crédito. Experiência no desenvolvimento e operacionalização de modelos de antifraude PIX e Probabilidade de Inadimplência, além de componentes de PD, LGD, EAD e EL/ECL aplicados à gestão de risco.",
         about_p2: "Atuação com <strong>Python, SQL, PySpark, Spark, MLOps e ecossistemas Big Data</strong>, incluindo preparação e transformação de dados, desenvolvimento e validação de modelos, automação de pipelines, monitoramento e soluções analíticas em produção. Entre as entregas recentes estão modelo antifraude PIX com <strong>Recall de 97% e FPR inferior a 1%</strong>, pipeline semanal de MLOps para milhões de transações e modelo de risco de crédito aplicado a aproximadamente <strong>700 mil clientes bancários</strong>.",
         about_p3: "Experiência anterior em gestão de projetos, produtos bancários, análise de crédito, relacionamento com clientes e operações financeiras, atuando na interface entre dados, risco, negócio, produto e tecnologia. <strong>Inglês avançado, nível C1 com fluência nível business</strong>.",
-        forge_section_title: "Como o Squad Forge SE Criou Este Site de Forma 100% Autônoma",
+        forge_section_title: "Como o Squad Forge SE Implementou Este Portfólio",
         forge_section_subtitle: "Pipeline determinístico de engenharia autônoma com modelo local (llama.cpp / qwen3.8-27b a $0.00 de custo)",
-        forge_process_intro: "Este portfólio foi especificado por Adilio Farias por meio de um <strong>PRD (Product Requirements Document)</strong>, critérios de aceite e contratos de engenharia, e então implementado pelo <strong>Squad Forge SE</strong> — seu Control Plane Open-Source de Engenharia de Software autônoma. A inferência de ponta a ponta utilizou o servidor local <code>llama.cpp</code> com o modelo <code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B) com <strong>custo de nuvem de $0.00 USD</strong>.",
+        forge_process_intro: "Este portfólio foi especificado por Adilio Farias por meio de um <strong>PRD (Product Requirements Document)</strong>, critérios de aceite e contratos de engenharia, e então implementado pelo <strong>Squad Forge SE</strong> — seu Control Plane Open-Source de Engenharia de Software autônoma. A inferência de ponta a ponta utilizou o servidor local <code>llama.cpp</code> com o modelo <code>qwen3.8-27b</code> (Qwen3.8 27B) com <strong>custo de nuvem de $0.00 USD</strong>.",
         step1_title: "1. Decomposição do PRD (Scrum Master)",
         step1_desc: "O Scrum Master decompôs o PRD em tickets atômicos, mapeou o catálogo de projetos do GitHub e estabeleceu a matriz de dependências.",
         step2_title: "2. Congelamento de Contratos (Chief Engineer)",
@@ -790,7 +791,7 @@
         proj4_desc: "Agente inteligente RAG para análise epidemiológica e inteligência em vigilância de saúde pública a partir de dados do Datasus (SRAG), desenvolvido e premiado no Desafio Indicium AI para Engenheiro de IA.",
         proj5_desc: "Plataforma de engenharia de risco de crédito com dados sintéticos, componentes PD/LGD/EAD, cálculo de EL/ECL, staging IFRS 9/CMN 4.966, API FastAPI e pacote versionado de evidências regulatórias.",
         proj6_desc: "Construção e calibração estatística de scorecards de crédito bancário com Weight of Evidence (WoE), Information Value (IV), regressão logística regularizada e métricas de discriminação (KS, AUC-ROC, Gini).",
-        proj7_desc: "Sistema de detecção de fraudes e anomalias em transações PIX em tempo real com processamento de streams (Kafka), inferência assíncrona com XGBoost e latência rigorosa sub-50ms para autorização de pagamentos.",
+        proj7_desc: "Motor antifraude PIX em tempo real com FastAPI, feature stores Redis/PostgreSQL, LightGBM + Isolation Forest, explicabilidade SHAP, MLflow e monitoramento contínuo de drift, com p95 inferior a 15 ms no benchmark do projeto.",
         btn_view_repo: "Ver Repositório",
         skills_badge: "Competências & Especialidades",
         skills_title: "Matriz de Habilidades Técnicas",
@@ -812,7 +813,7 @@
         contact_title: "Vamos Construir Soluções em IA Juntos?",
         contact_subtitle: "Aberto a oportunidades como AI Engineer ou Senior Data Scientist, além de colaboração em projetos de IA e Ciência de Dados.",
         footer_copyright: "&copy; 2026 Adilio Farias (@Masteradilio). Todos os direitos reservados.",
-        footer_badge: "⚡ Este site foi 100% concebido, implementado, testado e compilado de forma autônoma pelo <strong>Squad Forge SE</strong> utilizando modelo local (llama.cpp / qwen3.8-27b a $0.00 de custo)."
+        footer_badge: "⚡ Este portfólio foi especificado por Adilio Farias e implementado, testado e empacotado pelo <strong>Squad Forge SE</strong> utilizando modelo local (llama.cpp / qwen3.8-27b a $0.00 de custo de API em nuvem)."
       },
       en: {
         nav_about: "About",
@@ -833,6 +834,7 @@
         acad_pos_inst: "Data Science Academy",
         seniority_card_title: "Accumulated Professional Experience",
         seniority_card_subtitle: "Multidisciplinary career with overlapping roles",
+        seniority_badge: "16+ years in financial services",
         role_ds: "Data Scientist",
         role_ds_time: "3+ years",
         role_ai_eng: "AI/ML Engineer",
@@ -851,9 +853,9 @@
         about_p1: "Hello! I am <strong>Adilio Farias</strong>, an <strong>AI/ML Engineer and Senior Data Scientist</strong> with 16 years of experience in the financial sector, combining banking business acumen with hands-on Machine Learning expertise in fraud prevention and credit risk. Proven experience developing and operationalizing PIX anti-fraud and Probability of Default models, as well as PD, LGD, EAD, and EL/ECL risk components.",
         about_p2: "Hands-on with <strong>Python, SQL, PySpark, Spark, MLOps, and Big Data ecosystems</strong>, including data prep/transformation, model validation, pipeline automation, drift monitoring, and production analytics. Recent deliveries include a PIX anti-fraud model with <strong>97% Recall and FPR &lt; 1%</strong>, a weekly MLOps pipeline for millions of transactions, and a credit risk model serving approximately <strong>700,000 banking customers</strong>.",
         about_p3: "Prior background in project management, banking products, credit analysis, customer relationship management, and financial operations, operating across data, risk, business, product, and technology. <strong>Advanced English (C1 CEFR level, business fluency)</strong>.",
-        forge_section_title: "How Squad Forge SE Autonomously Built This Website",
+        forge_section_title: "How Squad Forge SE Implemented This Portfolio",
         forge_section_subtitle: "Deterministic autonomous engineering pipeline using local model (llama.cpp / qwen3.8-27b at $0.00 cost)",
-        forge_process_intro: "This portfolio was specified by Adilio Farias through a <strong>PRD (Product Requirements Document)</strong>, acceptance criteria, and engineering contracts, then implemented by <strong>Squad Forge SE</strong> — his open-source autonomous software engineering control plane. End-to-end inference ran locally on <code>llama.cpp</code> with <code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B) with <strong>$0.00 USD cloud API cost</strong>.",
+        forge_process_intro: "This portfolio was specified by Adilio Farias through a <strong>PRD (Product Requirements Document)</strong>, acceptance criteria, and engineering contracts, then implemented by <strong>Squad Forge SE</strong> — his open-source autonomous software engineering control plane. End-to-end inference ran locally on <code>llama.cpp</code> with <code>qwen3.8-27b</code> (Qwen3.8 27B) with <strong>$0.00 USD cloud API cost</strong>.",
         step1_title: "1. PRD Decomposition (Scrum Master)",
         step1_desc: "The autonomous Scrum Master parsed the PRD into atomic tasks, mapped the GitHub repositories, and structured the dependency graph.",
         step2_title: "2. Contract Freezing (Chief Engineer)",
@@ -882,7 +884,7 @@
         proj4_desc: "Intelligent RAG agent for public health data analytics and epidemiological surveillance using Datasus (SRAG) datasets, awarded in the Indicium AI Challenge for AI Engineers.",
         proj5_desc: "Credit-risk engineering platform using synthetic data, with PD/LGD/EAD components, EL/ECL calculation, IFRS 9/CMN 4.966 staging, FastAPI, and versioned regulatory evidence.",
         proj6_desc: "Statistical credit scorecard development and probability of default calibration with Weight of Evidence (WoE), Information Value (IV), regularized logistic regression, and KS/AUC metrics.",
-        proj7_desc: "Real-time stream processing anomaly and fraud detection system for instant PIX payments with Apache Kafka, XGBoost, and sub-50ms latency SLAs for payment authorization.",
+        proj7_desc: "Real-time PIX anti-fraud engine with FastAPI, Redis/PostgreSQL feature stores, LightGBM + Isolation Forest, SHAP explainability, MLflow, and continuous drift monitoring, with p95 below 15 ms in the project benchmark.",
         btn_view_repo: "View Repository",
         skills_badge: "Skills & Specializations",
         skills_title: "Technical Skills Matrix",
@@ -904,7 +906,7 @@
         contact_title: "Let's Build Great AI Solutions Together!",
         contact_subtitle: "Open to AI Engineer and Senior Data Scientist opportunities, as well as collaboration on AI and Data Science projects.",
         footer_copyright: "&copy; 2026 Adilio Farias (@Masteradilio). All rights reserved.",
-        footer_badge: "⚡ This website was 100% autonomously designed, implemented, tested, and compiled by <strong>Squad Forge SE</strong> using a local LLM (llama.cpp / qwen3.8-27b at $0.00 cost)."
+        footer_badge: "⚡ This portfolio was specified by Adilio Farias and implemented, tested, and packaged by <strong>Squad Forge SE</strong> using a local LLM (llama.cpp / qwen3.8-27b at $0.00 cloud API cost)."
       }
     };
 
