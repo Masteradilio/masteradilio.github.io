@@ -119,9 +119,9 @@ A release is recruiter-ready only when all critical tests pass:
 - Normal response: ideally under 30 seconds.
 - Free-tier degradation: retry alternate live models; if none can produce a validated answer, return an explicit temporary-unavailable message within the frontend timeout.
 - The UI may state that free-tier responses can take up to 60 seconds.
+- CI must validate the Worker as a Cloudflare ES module and reject duplicate critical function declarations.
 
 When a canonical project README changes materially, rerun this suite before considering the assistant recruiter-ready.
-
 
 ## Live-generation regressions
 
@@ -130,5 +130,4 @@ When a canonical project README changes materially, rerun this suite before cons
 - A current MLOps question must not inherit repository selection from unrelated earlier turns.
 - DataSUS RAG Agent must not be called synthetic unless its canonical repository evidence explicitly changes.
 - Internal phrases such as `non-negotiable rule`, `rule states`, or evidence-selection mechanics must never reach the user.
-
 - A new explicit question must select repository evidence from the current question only; prior turns may support conversational continuity but must not contaminate retrieval for a different topic.
