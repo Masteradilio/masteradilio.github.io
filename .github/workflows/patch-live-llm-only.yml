@@ -1,0 +1,133 @@
+name: Patch recruiter assistant to live LLM only
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/patch-live-llm-only.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: career-assistant-live-llm-only-20260822
+          fetch-depth: 0
+
+      - name: Remove substantive deterministic fallbacks
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          worker = Path('cloudflare/adilio-career-assistant.js')
+          text = worker.read_text(encoding='utf-8')
+
+          text = text.replace("v2026.10: recruiter-facing RAG hardening.", "v2026.11: live-LLM recruiter RAG hardening.")
+          text = text.replace("- resilient grounded fallbacks for critical recruiter questions", "- no substantive prewritten fallbacks; content answers always come from live LLM + RAG")
+          text = text.replace("const SERVICE_VERSION = '2026.10';", "const SERVICE_VERSION = '2026.11';")
+
+          start = text.find('function localFallback(')
+          end = text.find('async function repairAnswer(', start)
+          if start < 0 or end < 0:
+              raise SystemExit('Could not locate localFallback block')
+
+          replacement = """function unavailableReply(language) {
+  return language === 'pt'
+    ? 'O assistente de IA está temporariamente indisponível para gerar uma resposta confiável. Tente novamente em alguns instantes.'
+    : 'The AI assistant is temporarily unable to generate a reliable answer. Please try again in a few moments.';
+}
+
+"""
+          text = text[:start] + replacement + text[end:]
+
+          old = """      if (!apiKey) {
+        const fallback = localFallback(question, language, plan, repos);
+        return jsonResponse(request, { reply: fallback, sources: filterSourcesForReply(fallback, candidateSources, plan, language), model_used: 'grounded-local-fallback', status: 'success', request_id: requestId });
+      }
+"""
+          new = """      if (!apiKey) {
+        const unavailable = unavailableReply(language);
+        return jsonResponse(request, { reply: unavailable, sources: [], model_used: null, generation_mode: 'unavailable', status: 'unavailable', request_id: requestId });
+      }
+"""
+          if old not in text:
+              raise SystemExit('Could not locate missing-api-key fallback block')
+          text = text.replace(old, new)
+
+          text = text.replace(
+              "reply = repaired?.reply || localFallback(question, language, plan, repos);",
+              "reply = repaired?.reply || '';"
+          )
+
+          old_end = """      const fallback = localFallback(question, language, plan, repos);
+      return jsonResponse(request, { reply: fallback, sources: filterSourcesForReply(fallback, candidateSources, plan, language), model_used: 'grounded-local-fallback', status: 'success', request_id: requestId });
+"""
+          new_end = """      const unavailable = unavailableReply(language);
+      return jsonResponse(request, { reply: unavailable, sources: [], model_used: null, generation_mode: 'unavailable', status: 'unavailable', request_id: requestId });
+"""
+          if old_end not in text:
+              raise SystemExit('Could not locate terminal fallback block')
+          text = text.replace(old_end, new_end)
+
+          text = text.replace(
+              "return jsonResponse(request, { reply, sources: filterSourcesForReply(reply, allSources, plan, language), model_used: model, status: 'success', tool_executed: true, request_id: requestId });",
+              "return jsonResponse(request, { reply, sources: filterSourcesForReply(reply, allSources, plan, language), model_used: model, generation_mode: 'llm-rag', status: 'success', tool_executed: true, request_id: requestId });"
+          )
+          text = text.replace(
+              "return jsonResponse(request, { reply, sources: filterSourcesForReply(reply, candidateSources, plan, language), model_used: model, status: 'success', tool_executed: false, request_id: requestId });",
+              "return jsonResponse(request, { reply, sources: filterSourcesForReply(reply, candidateSources, plan, language), model_used: model, generation_mode: 'llm-rag', status: 'success', tool_executed: false, request_id: requestId });"
+          )
+
+          if 'localFallback(' in text or 'grounded-local-fallback' in text:
+              raise SystemExit('Substantive deterministic fallback remnants still exist')
+
+          worker.write_text(text, encoding='utf-8')
+
+          evals = Path('docs/RAG_EVAL_SUITE.md')
+          e = evals.read_text(encoding='utf-8')
+          e = e.replace(
+              '- free-tier model failure falls back to a grounded deterministic answer for critical recruiter questions.',
+              '- substantive content answers are always generated by a live LLM with RAG context; model/provider failure returns an explicit unavailable state rather than a prewritten substantive answer.'
+          )
+          e = e.replace(
+              '- Do not fail if the first free model is unavailable.',
+              '- Retry other configured models if the first free model is unavailable; never substitute a prewritten substantive answer.'
+          )
+          e = e.replace(
+              '- Free-tier degradation: critical recruiter questions should still return a grounded fallback within the frontend timeout.',
+              '- Free-tier degradation: retry alternate live models; if none can produce a validated answer, return an explicit temporary-unavailable message within the frontend timeout.'
+          )
+          if 'prewritten substantive answer' not in e:
+              e += '\n\n## Live-generation contract\n\n- Recruiter content questions must never be answered from prewritten question-specific templates.\n- Deterministic behavior is reserved for security refusals and non-content utilities such as CV/contact actions.\n- A successful substantive answer must report `generation_mode: llm-rag` from the Worker.\n'
+          evals.write_text(e, encoding='utf-8')
+
+          ci = Path('.github/workflows/portfolio-professionalization.yml')
+          c = ci.read_text(encoding='utf-8')
+          c = c.replace("grep -q \"SERVICE_VERSION = '2026.10'\" cloudflare/adilio-career-assistant.js", "grep -q \"SERVICE_VERSION = '2026.11'\" cloudflare/adilio-career-assistant.js")
+          c = c.replace("          grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js\n", "          ! grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js\n          ! grep -q 'function localFallback' cloudflare/adilio-career-assistant.js\n          grep -q \"generation_mode: 'llm-rag'\" cloudflare/adilio-career-assistant.js\n          grep -q 'function unavailableReply' cloudflare/adilio-career-assistant.js\n")
+          ci.write_text(c, encoding='utf-8')
+          PY
+
+      - name: Validate Worker as Cloudflare ES module
+        run: |
+          cp cloudflare/adilio-career-assistant.js /tmp/adilio-career-assistant.mjs
+          node --check /tmp/adilio-career-assistant.mjs
+          test "$(grep -c '^async function callOpenRouter' cloudflare/adilio-career-assistant.js)" -eq 1
+          test "$(grep -c '^function unavailableReply' cloudflare/adilio-career-assistant.js)" -eq 1
+          ! grep -q 'function localFallback' cloudflare/adilio-career-assistant.js
+          ! grep -q 'grounded-local-fallback' cloudflare/adilio-career-assistant.js
+
+      - name: Commit patch to review branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add cloudflare/adilio-career-assistant.js docs/RAG_EVAL_SUITE.md .github/workflows/portfolio-professionalization.yml
+          git commit -m 'Require live LLM generation for recruiter content answers'
+          git push origin HEAD:career-assistant-live-llm-only-20260822
