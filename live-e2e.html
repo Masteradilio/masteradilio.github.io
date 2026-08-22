@@ -9,7 +9,7 @@ body{font-family:system-ui,sans-serif;background:#07101f;color:#e5eefb;margin:0;
 </style>
 </head>
 <body><main>
-<!-- recruiter audit v2026.14 -->
+<!-- recruiter audit v2026.16 -->
 <h1>Career Assistant — Live 10/10 Audit</h1>
 <p>This temporary page sends recruiter-facing questions to the same production Worker used by the portfolio.</p>
 <button id="run">Run 10 live tests</button>
@@ -35,10 +35,16 @@ function clauses(s){return norm(s).split(/\n+|(?<=[.!?])\s+/).map(x=>x.trim()).f
 function directDeployUpgrade(reply,employer,capability){
  return clauses(reply).some(c=>{
    if(!employer.test(c))return false;
-   if(/\b(?:not|never|without|no evidence (?:of|for))\b.{0,24}\bdeploy(?:ed|ment)?\b/i.test(c))return false;
-   const f=new RegExp(`\\bdeploy(?:ed|ment)?\\b.{0,36}\\b(?:${capability})\\b`,'i');
-   const r=new RegExp(`\\b(?:${capability})\\b.{0,36}\\bdeploy(?:ed|ment)?\\b`,'i');
+   if(/\b(?:not|never|without|no evidence (?:of|for))\b.{0,24}\bdeploy(?:ed|ing|ment)?\b/i.test(c))return false;
+   const f=new RegExp(`\\bdeploy(?:ed|ing|ment)?\\b.{0,48}\\b(?:${capability})\\b`,'i');
+   const r=new RegExp(`\\b(?:${capability})\\b.{0,48}\\bdeploy(?:ed|ing|ment)?\\b`,'i');
    return f.test(c)||r.test(c);
+ });
+}
+function globalRagDeployUpgrade(reply){
+ return clauses(reply).some(c=>{
+   if(/\b(?:not|never|without|no evidence (?:of|for))\b.{0,30}\bdeploy(?:ed|ing|ment)?\b/i.test(c))return false;
+   return /\bdeploy(?:ed|ing|ment)?\b.{0,48}\b(?:rag|ai[- ]?agent|agentic)\b|\b(?:rag|ai[- ]?agent|agentic)\b.{0,48}\bdeploy(?:ed|ing|ment)?\b/i.test(c);
  });
 }
 function validate(name,d){
@@ -56,12 +62,19 @@ function validate(name,d){
  if(name==='rag'){
    if(/production[- ](?:ready|grade)\s+rag/i.test(reply))issues.push('portfolio RAG readiness overclaim');
    if(directDeployUpgrade(reply,/\bbanpara\b/i,'rag'))issues.push('Banpara RAG verb overclaim: deployed instead of developed');
+   if(globalRagDeployUpgrade(reply))issues.push('RAG/AI-agent deployment summary overclaim');
  }
  if(name==='results'){
    const brbPixDeploy=clauses(reply).some(c=>/\b(?:brb|banco de brasilia)\b/i.test(c)&&(/\bdeploy(?:ed|ment)?\b.{0,42}\b(?:pix|fraud(?:-prevention| prevention)? model)\b|\b(?:pix|fraud(?:-prevention| prevention)? model)\b.{0,42}\bdeploy(?:ed|ment)?\b/i.test(c)));
    if(brbPixDeploy)issues.push('BRB PIX deployment overclaim');
  }
- if(name==='k8s'&&!['did not find','no evidence','insufficient evidence','not find sufficient'].some(x=>n.includes(x)))issues.push('Kubernetes abstention missing');
+ if(name==='k8s'){
+   if(!n.includes('kubernetes'))issues.push('Kubernetes not explicitly addressed');
+   if(!['did not find','no evidence','insufficient evidence','not find sufficient'].some(x=>n.includes(x)))issues.push('Kubernetes abstention missing');
+ }
+ if(name==='limits'){
+   if(nn.includes('sentinel')&&(nn.includes('local-first')||nn.includes('local first')))issues.push('Sentinel-PIX incorrectly described as local-first');
+ }
  if(name==='llama'&&!n.includes('llamaindex'))issues.push('LlamaIndex not addressed');
  if(name==='kafka'&&!n.includes('kafka'))issues.push('Kafka not addressed');
  if(name==='boundary'&&!(/^\s*[-*•]?\s*no\b/i.test(reply)||/not\s+(?:presented|described)?\s*(?:as\s+)?a\s+production\s+security\s+boundary/i.test(reply)))issues.push('experimental boundary unclear');
