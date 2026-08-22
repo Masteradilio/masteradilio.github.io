@@ -3,32 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adilio Farias | Senior Data Scientist & AI/ML Engineer</title>
-  <meta name="description" content="Portfolio de Adilio Farias (@Masteradilio) - Senior Data Scientist, AI Engineer, Especialista em Generative AI, Enterprise RAG, MLOps, Time Series e Deteccao de Fraudes.">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              dark: '#070b14',
-              darker: '#04070d',
-              card: '#0d1527',
-              cardHover: '#131e38',
-              border: '#1f2e4d',
-              cyan: '#06b6d4',
-              emerald: '#10b981',
-              indigo: '#6366f1',
-              accent: '#38bdf8'
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <title>Adilio Farias | AI Engineer & Senior Data Scientist</title>
+  <meta name="description" content="Portfolio de Adilio Farias (@Masteradilio), AI Engineer e Senior Data Scientist. Projetos em Machine Learning, Generative AI, LLMs, RAG, MLOps, risco de credito e prevencao a fraudes.">
+  <link rel="canonical" href="https://masteradilio.github.io/">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://masteradilio.github.io/">
+  <meta property="og:title" content="Adilio Farias | AI Engineer & Senior Data Scientist">
+  <meta property="og:description" content="Machine Learning, Generative AI, LLMs, RAG, MLOps, financial risk and fraud prevention projects.">
+  <meta property="og:image" content="https://masteradilio.github.io/assets/portfolio-og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Adilio Farias | AI Engineer & Senior Data Scientist">
+  <meta name="twitter:description" content="Machine Learning, Generative AI, LLMs, RAG, MLOps, financial risk and fraud prevention projects.">
+  <meta name="twitter:image" content="https://masteradilio.github.io/assets/portfolio-og.png">
+  <link rel="stylesheet" href="assets/tailwind.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.13/dist/purify.min.js" crossorigin="anonymous"></script>
   <style>
     body { background-color: #070b14; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; }
     .glow-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.2); }
@@ -37,6 +31,24 @@
     .glass-card { background: rgba(13, 21, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(31, 46, 77, 0.75); }
     .gradient-text { background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Adilio Farias",
+    "url": "https://masteradilio.github.io/",
+    "jobTitle": "AI Engineer and Senior Data Scientist",
+    "sameAs": [
+      "https://github.com/Masteradilio",
+      "https://www.linkedin.com/in/adiliofarias"
+    ],
+    "knowsAbout": [
+      "Machine Learning", "Generative AI", "Large Language Models", "RAG",
+      "AI Agents", "MLOps", "Credit Risk", "Fraud Prevention", "Python", "SQL"
+    ]
+  }
+  </script>
 </head>
 <body class="min-h-screen selection:bg-cyan-500 selection:text-white flex flex-col justify-between">
   <header class="fixed top-0 left-0 right-0 z-50 glass-nav">
@@ -74,7 +86,7 @@
         <a href="assets/cv_adilio_farias_pt.html" target="_blank" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-cyan-300 hover:text-cyan-200 border border-slate-700 text-xs font-semibold shadow-sm transition-all" title="Baixar Currículo PT-BR">
           <span>🇧🇷</span> <span data-i18n="btn_cv_pt_short">CV (PT-BR)</span>
         </a>
-        <a href="assets/cv_adilio_farias_en.html" target="_blank" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-cyan-300 hover:text-cyan-200 border border-slate-700 text-xs font-semibold shadow-sm transition-all" title="Download Resume EN-US">
+        <a href="assets/cv_adilio_farias_en.html" target="_blank" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-cyan-300 hover:text-cyan-200 border border-slate-700 text-xs font-semibold shadow-sm transition-all" title="Full Resume (HTML) EN-US">
           <span>🇺🇸</span> <span data-i18n="btn_cv_en_short">Resume (EN)</span>
         </a>
 
@@ -109,7 +121,7 @@
       <div class="lg:w-7/12 space-y-6 text-left">
         <div class="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span data-i18n="hero_badge">⚡ 100% Gerado de Forma Autônoma pelo Squad Forge SE via Modelo Local</span>
+          <span data-i18n="hero_badge">⚡ Construído com o Squad Forge SE — minha plataforma de engenharia autônoma com modelo local</span>
         </div>
         
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
@@ -137,7 +149,7 @@
         </div>
       </div>
 
-      <!-- Quadro de Senioridade -->
+      <!-- Experiência Profissional Acumulada -->
       <div class="lg:w-5/12 w-full flex justify-center">
         <div class="relative w-full max-w-md p-6 sm:p-7 rounded-2xl glass-card border border-brand-border/90 shadow-2xl glow-cyan space-y-4">
           <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -146,11 +158,11 @@
                 <i class="fa-solid fa-chart-line"></i>
               </div>
               <div>
-                <h3 class="font-bold text-white text-sm sm:text-base" data-i18n="seniority_card_title">Quadro de Senioridade</h3>
-                <p class="text-[11px] text-slate-400 font-mono" data-i18n="seniority_card_subtitle">Tempo de Atuação Profissional</p>
+                <h3 class="font-bold text-white text-sm sm:text-base" data-i18n="seniority_card_title">Experiência Profissional Acumulada</h3>
+                <p class="text-[11px] text-slate-400 font-mono" data-i18n="seniority_card_subtitle">Carreira multidisciplinar com períodos sobrepostos</p>
               </div>
             </div>
-            <span class="text-[10px] px-2.5 py-1 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 font-mono font-semibold">Setor Financeiro</span>
+            <span class="text-[10px] px-2.5 py-1 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 font-mono font-semibold">16+ anos no setor financeiro</span>
           </div>
 
           <div class="space-y-2 text-xs font-mono">
@@ -182,7 +194,7 @@
 
           <div class="pt-2 border-t border-slate-800/80">
             <p class="text-[10.5px] text-slate-400 italic leading-snug font-sans" data-i18n="seniority_card_note">
-              * Nota: Atuação desenvolvida por vezes de forma sobreposta entre funções (roles), e não de forma puramente seriada.
+              * Os períodos acima representam experiência acumulada por domínio. Algumas funções foram exercidas simultaneamente e, por isso, não devem ser somadas como uma linha do tempo única.
             </p>
           </div>
         </div>
@@ -370,10 +382,10 @@
             </div>
             <h3 class="text-lg sm:text-xl font-bold text-white">credit_risk_model</h3>
             <p class="text-xs text-slate-300 leading-relaxed" data-i18n="proj5_desc">
-              Pipeline end-to-end de classificação de risco de crédito bancário com LightGBM e XGBoost, otimização Bayesiana de hiperparâmetros com Optuna e explicabilidade de decisões financeiras via SHAP.
+              Plataforma de engenharia de risco de crédito com dados sintéticos, componentes PD/LGD/EAD, cálculo de EL/ECL, staging IFRS 9/CMN 4.966, API FastAPI e pacote versionado de evidências regulatórias.
             </p>
             <div class="space-y-1.5 text-[11px] font-mono text-slate-400 bg-slate-900/60 p-2.5 rounded-lg">
-              <div><strong class="text-emerald-300">Destaque:</strong> SHAP Explainability & Optuna Tuning</div>
+              <div><strong class="text-emerald-300">Destaque:</strong> PD/LGD/EAD • ECL • Regulatory Evidence</div>
             </div>
             <div class="flex flex-wrap gap-1.5 pt-1">
               <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Python</span>
@@ -433,7 +445,7 @@
               Sistema de detecção de fraudes e anomalias em transações PIX em tempo real com processamento de streams (Kafka), inferência assíncrona com XGBoost e latência rigorosa sub-50ms para autorização de pagamentos.
             </p>
             <div class="space-y-1.5 text-[11px] font-mono text-slate-400 bg-slate-900/60 p-2.5 rounded-lg">
-              <div><strong class="text-emerald-300">Destaque:</strong> Streaming Kafka & Latência Sub-50ms</div>
+              <div><strong class="text-emerald-300">Destaque:</strong> Recall 99,86% • FPR 0,957% • p95 < 15 ms</div>
             </div>
             <div class="flex flex-wrap gap-1.5 pt-1">
               <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Python</span>
@@ -477,7 +489,7 @@
         </div>
 
         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" data-i18n="forge_process_intro">
-          Este portfólio não foi codificado manualmente: foi inteiramente especificado via <strong>PRD (Product Requirements Document)</strong> e construído pelo <strong>Squad Forge SE</strong> — o Control Plane Open-Source de Engenharia de Software desenvolvido por Adilio Farias. A inferência de ponta a ponta utilizou o servidor local <code>llama.cpp</code> com o modelo <code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B) com <strong>custo de nuvem de $0.00 USD</strong>.
+          Este portfólio foi especificado por Adilio Farias por meio de um <strong>PRD (Product Requirements Document)</strong>, critérios de aceite e contratos de engenharia, e então implementado pelo <strong>Squad Forge SE</strong> — seu Control Plane Open-Source de Engenharia de Software autônoma. A inferência de ponta a ponta utilizou o servidor local <code>llama.cpp</code> com o modelo <code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B) com <strong>custo de nuvem de $0.00 USD</strong>.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -641,7 +653,7 @@
             </div>
             <div>
               <h3 class="font-bold text-white text-base sm:text-lg" data-i18n="bot_title">Assistente interativo sobre mim</h3>
-              <p class="text-[11px] sm:text-xs text-slate-400" data-i18n="bot_subtitle">Pergunte o que quiser sobre minhas experiências profissionais, educação e meus projetos de portfólio.</p>
+              <p class="text-[11px] sm:text-xs text-slate-400" data-i18n="bot_subtitle">Faça sua própria pergunta sobre minhas experiências, formação ou projetos. Perguntas de conteúdo são respondidas pelo LLM com contexto RAG.</p>
             </div>
           </div>
         </div>
@@ -649,7 +661,7 @@
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs bg-slate-900/60 p-3 rounded-xl border border-slate-800">
           <div class="flex items-center gap-2 text-slate-300 font-medium">
             <i class="fa-solid fa-file-pdf text-cyan-400"></i>
-            <span data-i18n="rag_status_label">Baixe meu currículo</span>
+            <span data-i18n="rag_status_label">Currículo completo (HTML)</span>
           </div>
           <div class="flex items-center gap-2">
             <a href="assets/cv_adilio_farias_pt.html" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 hover:border-cyan-500 transition-colors flex items-center gap-1.5 font-medium shadow-sm">
@@ -661,7 +673,7 @@
           </div>
         </div>
 
-        <div class="p-4 sm:p-6 rounded-xl bg-slate-950/90 border border-slate-800 h-[480px] sm:h-[540px] overflow-y-auto space-y-4 font-sans text-xs sm:text-sm" id="chat-box">
+        <div class="p-4 sm:p-6 rounded-xl bg-slate-950/90 border border-slate-800 h-[480px] sm:h-[540px] overflow-y-auto space-y-4 font-sans text-xs sm:text-sm" id="chat-box" aria-live="polite" aria-label="AI career assistant conversation">
           <div class="flex gap-2.5">
             <div class="w-7 h-7 rounded-full bg-cyan-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0 shadow">AI</div>
             <div class="p-4 rounded-xl rounded-tl-none bg-slate-800 text-slate-200 leading-relaxed max-w-[95%] w-full" id="bot-welcome-msg">
@@ -671,12 +683,12 @@
         </div>
 
         <form id="chat-form" class="flex gap-2">
-          <input type="text" id="chat-input" placeholder="Pergunte sobre experiências, formação, projetos ou contratação..." class="flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+          <input type="text" id="chat-input" maxlength="1200" autocomplete="off" placeholder="Pergunte sobre experiências, formação, projetos ou contratação..." class="flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
           <button type="submit" id="chat-submit-btn" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 font-semibold text-xs sm:text-sm text-white transition-all flex items-center gap-2">
             <span data-i18n="bot_send_btn">Perguntar</span> <i class="fa-solid fa-paper-plane text-xs"></i>
           </button>
         </form>
-        <p class="text-[11px] text-slate-400 italic text-center sm:text-left mt-2" data-i18n="chat_latency_note">Observação: é normal haver uma latência de até 60 segundos para receber a resposta do Agente.</p>
+        <p class="text-[11px] text-slate-400 italic text-center sm:text-left mt-2" data-i18n="chat_latency_note">Observação: as respostas de conteúdo são geradas pelo LLM com RAG e podem levar até 60 segundos no tier gratuito. Contato e acesso ao currículo usam apenas respostas utilitárias determinísticas.</p>
       </div>
     </section>
 
@@ -684,7 +696,7 @@
       <div class="space-y-3">
         <h2 class="text-2xl sm:text-3xl font-extrabold text-white" data-i18n="contact_title">Vamos Construir Soluções em IA Juntos?</h2>
         <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto" data-i18n="contact_subtitle">
-          Disponível para posições de liderança técnica, contratação direta ou consultoria em sistemas de IA e ciência de dados.
+          Aberto a oportunidades como AI Engineer ou Senior Data Scientist, além de colaboração em projetos de IA e Ciência de Dados.
         </p>
       </div>
 
@@ -717,7 +729,7 @@
         nav_skills: "Habilidades",
         nav_ai_bot: "AI Assistant",
         nav_contact: "Contato",
-        hero_badge: "⚡ 100% Gerado de Forma Autônoma pelo Squad Forge SE via Modelo Local",
+        hero_badge: "⚡ Construído com o Squad Forge SE — minha plataforma de engenharia autônoma com modelo local",
         hero_title: "Ciência de Dados, Engenharia de IA, RAG e Agentes de IA para ambientes corporativos",
         acad_msc_title: "Mestrado em IA",
         acad_msc_inst: "AGTU (EUA - em andamento)",
@@ -727,8 +739,8 @@
         acad_mba_inst: "UNIASSELVI",
         acad_pos_title: "Pós em Eng. de IA",
         acad_pos_inst: "Data Science Academy",
-        seniority_card_title: "Quadro de Senioridade",
-        seniority_card_subtitle: "Tempo de Atuação Profissional",
+        seniority_card_title: "Experiência Profissional Acumulada",
+        seniority_card_subtitle: "Carreira multidisciplinar com períodos sobrepostos",
         role_ds: "Cientista de Dados",
         role_ds_time: "3+ anos de atuação",
         role_ai_eng: "Engenheiro de IA/ML",
@@ -741,7 +753,7 @@
         role_pm_time: "4+ anos de atuação",
         role_lead: "Liderança de equipes",
         role_lead_time: "8+ anos de atuação",
-        seniority_card_note: "* Nota: Atuação desenvolvida por vezes de forma sobreposta entre funções (roles), e não de forma puramente seriada.",
+        seniority_card_note: "* Os períodos acima representam experiência acumulada por domínio. Algumas funções foram exercidas simultaneamente e, por isso, não devem ser somadas como uma linha do tempo única.",
         about_badge: "Sobre Mim",
         about_title: "Trajetória Profissional & Especialização",
         about_p1: "Olá! Sou o <strong>Adilio Farias</strong>, <strong>Engenheiro de IA/ML e Cientista de Dados</strong> com 16 anos de experiência no setor financeiro, combinando conhecimento de negócio bancário com atuação em Machine Learning, prevenção a fraudes e risco de crédito. Experiência no desenvolvimento e operacionalização de modelos de antifraude PIX e Probabilidade de Inadimplência, além de componentes de PD, LGD, EAD e EL/ECL aplicados à gestão de risco.",
@@ -749,7 +761,7 @@
         about_p3: "Experiência anterior em gestão de projetos, produtos bancários, análise de crédito, relacionamento com clientes e operações financeiras, atuando na interface entre dados, risco, negócio, produto e tecnologia. <strong>Inglês avançado, nível C1 com fluência nível business</strong>.",
         forge_section_title: "Como o Squad Forge SE Criou Este Site de Forma 100% Autônoma",
         forge_section_subtitle: "Pipeline determinístico de engenharia autônoma com modelo local (llama.cpp / qwen3.8-27b a $0.00 de custo)",
-        forge_process_intro: "Este portfólio não foi codificado manualmente: foi inteiramente especificado via <strong>PRD (Product Requirements Document)</strong> e construído pelo <strong>Squad Forge SE</strong> — o Control Plane Open-Source de Engenharia de Software desenvolvido por Adilio Farias. A inferência de ponta a ponta utilizou o servidor local <code>llama.cpp</code> com o modelo <code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B) com <strong>custo de nuvem de $0.00 USD</strong>.",
+        forge_process_intro: "Este portfólio foi especificado por Adilio Farias por meio de um <strong>PRD (Product Requirements Document)</strong>, critérios de aceite e contratos de engenharia, e então implementado pelo <strong>Squad Forge SE</strong> — seu Control Plane Open-Source de Engenharia de Software autônoma. A inferência de ponta a ponta utilizou o servidor local <code>llama.cpp</code> com o modelo <code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B) com <strong>custo de nuvem de $0.00 USD</strong>.",
         step1_title: "1. Decomposição do PRD (Scrum Master)",
         step1_desc: "O Scrum Master decompôs o PRD em tickets atômicos, mapeou o catálogo de projetos do GitHub e estabeleceu a matriz de dependências.",
         step2_title: "2. Congelamento de Contratos (Chief Engineer)",
@@ -776,7 +788,7 @@
         proj2_desc: "Suíte completa de previsão de séries temporais não-lineares e de alta volatilidade combinando redes neurais profundas (LSTMs, GRUs, Transformers) e modelagem econométrica clássica (SARIMAX), desenvolvida para a disciplina MIT-510 do Mestrado em IA (AGTU).",
         proj3_desc: "Framework de governança semântica e RAG governado por ontologias e Grafos de Conhecimento (Neo4j) para mitigar alucinações e proteger aplicações de LLMs em ambientes corporativos altamente regulados.",
         proj4_desc: "Agente inteligente RAG para análise epidemiológica e inteligência em vigilância de saúde pública a partir de dados do Datasus (SRAG), desenvolvido e premiado no Desafio Indicium AI para Engenheiro de IA.",
-        proj5_desc: "Pipeline end-to-end de classificação de risco de crédito bancário com LightGBM e XGBoost, otimização Bayesiana de hiperparâmetros com Optuna e explicabilidade de decisões financeiras via SHAP.",
+        proj5_desc: "Plataforma de engenharia de risco de crédito com dados sintéticos, componentes PD/LGD/EAD, cálculo de EL/ECL, staging IFRS 9/CMN 4.966, API FastAPI e pacote versionado de evidências regulatórias.",
         proj6_desc: "Construção e calibração estatística de scorecards de crédito bancário com Weight of Evidence (WoE), Information Value (IV), regressão logística regularizada e métricas de discriminação (KS, AUC-ROC, Gini).",
         proj7_desc: "Sistema de detecção de fraudes e anomalias em transações PIX em tempo real com processamento de streams (Kafka), inferência assíncrona com XGBoost e latência rigorosa sub-50ms para autorização de pagamentos.",
         btn_view_repo: "Ver Repositório",
@@ -787,7 +799,7 @@
         skill_p3_title: "Engenharia & MLOps",
         skill_p4_title: "Governança & Arquitetura",
         bot_title: "Assistente interativo sobre mim",
-        bot_subtitle: "Pergunte o que quiser sobre minhas experiências profissionais, educação e meus projetos de portfólio.",
+        bot_subtitle: "Faça sua própria pergunta sobre minhas experiências, formação ou projetos. Perguntas de conteúdo são respondidas pelo LLM com contexto RAG.",
         bot_welcome: "Olá! Sou o assistente virtual de <strong>Adilio Farias</strong>. Estou conectado aos currículos completos e aos READMEs técnicos dos repositórios públicos. Pergunte o que quiser sobre minhas experiências, educação e projetos!",
         bot_send_btn: "Perguntar",
         cv_download_label: "Currículo:",
@@ -795,10 +807,10 @@
         btn_cv_en: "Resume (EN)",
         btn_cv_pt_short: "CV (PT-BR)",
         btn_cv_en_short: "Resume (EN)",
-        rag_status_label: "Baixe meu currículo",
-        chat_latency_note: "Observação: é normal haver uma latência de até 60 segundos para receber a resposta do Agente.",
+        rag_status_label: "Currículo completo (HTML)",
+        chat_latency_note: "Observação: as respostas de conteúdo são geradas pelo LLM com RAG e podem levar até 60 segundos no tier gratuito. Contato e acesso ao currículo usam apenas respostas utilitárias determinísticas.",
         contact_title: "Vamos Construir Soluções em IA Juntos?",
-        contact_subtitle: "Disponível para posições de liderança técnica, contratação direta ou consultoria em sistemas de IA e ciência de dados.",
+        contact_subtitle: "Aberto a oportunidades como AI Engineer ou Senior Data Scientist, além de colaboração em projetos de IA e Ciência de Dados.",
         footer_copyright: "&copy; 2026 Adilio Farias (@Masteradilio). Todos os direitos reservados.",
         footer_badge: "⚡ Este site foi 100% concebido, implementado, testado e compilado de forma autônoma pelo <strong>Squad Forge SE</strong> utilizando modelo local (llama.cpp / qwen3.8-27b a $0.00 de custo)."
       },
@@ -819,8 +831,8 @@
         acad_mba_inst: "UNIASSELVI",
         acad_pos_title: "Postgrad AI Eng.",
         acad_pos_inst: "Data Science Academy",
-        seniority_card_title: "Seniority Breakdown",
-        seniority_card_subtitle: "Professional Experience Duration",
+        seniority_card_title: "Accumulated Professional Experience",
+        seniority_card_subtitle: "Multidisciplinary career with overlapping roles",
         role_ds: "Data Scientist",
         role_ds_time: "3+ years",
         role_ai_eng: "AI/ML Engineer",
@@ -833,7 +845,7 @@
         role_pm_time: "4+ years",
         role_lead: "Team Leadership",
         role_lead_time: "8+ years",
-        seniority_card_note: "* Note: Experience developed with concurrent overlapping roles rather than purely sequentially.",
+        seniority_card_note: "* The figures above represent accumulated experience by domain. Some roles overlapped and therefore should not be added as a single sequential timeline.",
         about_badge: "About Me",
         about_title: "Professional Background & Core Specialization",
         about_p1: "Hello! I am <strong>Adilio Farias</strong>, an <strong>AI/ML Engineer and Senior Data Scientist</strong> with 16 years of experience in the financial sector, combining banking business acumen with hands-on Machine Learning expertise in fraud prevention and credit risk. Proven experience developing and operationalizing PIX anti-fraud and Probability of Default models, as well as PD, LGD, EAD, and EL/ECL risk components.",
@@ -841,7 +853,7 @@
         about_p3: "Prior background in project management, banking products, credit analysis, customer relationship management, and financial operations, operating across data, risk, business, product, and technology. <strong>Advanced English (C1 CEFR level, business fluency)</strong>.",
         forge_section_title: "How Squad Forge SE Autonomously Built This Website",
         forge_section_subtitle: "Deterministic autonomous engineering pipeline using local model (llama.cpp / qwen3.8-27b at $0.00 cost)",
-        forge_process_intro: "This portfolio was not manually coded: it was specified entirely via a <strong>PRD (Product Requirements Document)</strong> and engineered by <strong>Squad Forge SE</strong> — the Open-Source Autonomous Software Engineering Control Plane created by Adilio Farias. End-to-end inference ran locally on <code>llama.cpp</code> with <code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B) with <strong>$0.00 USD cloud API cost</strong>.",
+        forge_process_intro: "This portfolio was specified by Adilio Farias through a <strong>PRD (Product Requirements Document)</strong>, acceptance criteria, and engineering contracts, then implemented by <strong>Squad Forge SE</strong> — his open-source autonomous software engineering control plane. End-to-end inference ran locally on <code>llama.cpp</code> with <code>qwen3.8-27b</code> (Qwen 2.5 Coder 27B) with <strong>$0.00 USD cloud API cost</strong>.",
         step1_title: "1. PRD Decomposition (Scrum Master)",
         step1_desc: "The autonomous Scrum Master parsed the PRD into atomic tasks, mapped the GitHub repositories, and structured the dependency graph.",
         step2_title: "2. Contract Freezing (Chief Engineer)",
@@ -868,7 +880,7 @@
         proj2_desc: "Comprehensive time-series forecasting suite for non-linear, high-volatility data combining Deep Learning (LSTMs, GRUs, Transformers) and econometric modeling (SARIMAX), developed for MIT-510 in the MSc in AI program (AGTU).",
         proj3_desc: "Enterprise semantic governance and RAG framework governed by ontologies and Knowledge Graphs (Neo4j) to eliminate hallucinations and protect corporate LLM pipelines.",
         proj4_desc: "Intelligent RAG agent for public health data analytics and epidemiological surveillance using Datasus (SRAG) datasets, awarded in the Indicium AI Challenge for AI Engineers.",
-        proj5_desc: "End-to-end banking credit risk classification pipeline with LightGBM/XGBoost, Optuna Bayesian hyperparameter tuning, and decision explainability via SHAP values.",
+        proj5_desc: "Credit-risk engineering platform using synthetic data, with PD/LGD/EAD components, EL/ECL calculation, IFRS 9/CMN 4.966 staging, FastAPI, and versioned regulatory evidence.",
         proj6_desc: "Statistical credit scorecard development and probability of default calibration with Weight of Evidence (WoE), Information Value (IV), regularized logistic regression, and KS/AUC metrics.",
         proj7_desc: "Real-time stream processing anomaly and fraud detection system for instant PIX payments with Apache Kafka, XGBoost, and sub-50ms latency SLAs for payment authorization.",
         btn_view_repo: "View Repository",
@@ -879,7 +891,7 @@
         skill_p3_title: "Engineering & MLOps",
         skill_p4_title: "Governance & Architecture",
         bot_title: "Interactive Assistant About Me",
-        bot_subtitle: "Ask anything about my professional experience, education, and portfolio projects.",
+        bot_subtitle: "Ask your own question about my experience, education, or projects. Content questions are answered by the LLM using RAG context.",
         bot_welcome: "Hello! I am the virtual assistant for <strong>Adilio Farias</strong>. I have permanent access to Adilio's full resume and the technical READMEs of public repositories. Feel free to ask anything about my experience, education, and projects!",
         bot_send_btn: "Ask",
         cv_download_label: "Resume:",
@@ -887,10 +899,10 @@
         btn_cv_en: "Resume (EN)",
         btn_cv_pt_short: "CV (PT-BR)",
         btn_cv_en_short: "Resume (EN)",
-        rag_status_label: "Download Resume",
-        chat_latency_note: "Note: it is normal to experience a latency of up to 60 seconds to receive the Agent's response.",
+        rag_status_label: "Full Resume (HTML)",
+        chat_latency_note: "Note: content answers are generated by the LLM with RAG and may take up to 60 seconds on the free tier. Contact and resume access use deterministic utility responses only.",
         contact_title: "Let's Build Great AI Solutions Together!",
-        contact_subtitle: "Available for technical leadership roles, direct hiring, or consulting in AI systems and data science.",
+        contact_subtitle: "Open to AI Engineer and Senior Data Scientist opportunities, as well as collaboration on AI and Data Science projects.",
         footer_copyright: "&copy; 2026 Adilio Farias (@Masteradilio). All rights reserved.",
         footer_badge: "⚡ This website was 100% autonomously designed, implemented, tested, and compiled by <strong>Squad Forge SE</strong> using a local LLM (llama.cpp / qwen3.8-27b at $0.00 cost)."
       }
@@ -1012,6 +1024,7 @@
         }
       },
       {
+        utility: true,
         triggers: [
           "como baixar o curriculo",
           "onde baixo o curriculo",
@@ -1030,6 +1043,7 @@
         }
       },
       {
+        utility: true,
         triggers: [
           "quais os contatos do adilio",
           "qual o email do adilio",
@@ -1220,7 +1234,13 @@
       html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-400 underline hover:text-cyan-300 font-medium inline-flex items-center gap-0.5">$1 <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>');
       html = html.replace(/(^|[\s(])(https?:\/\/[a-zA-Z0-9_\-\.\/\?%&=#\+]+)/g, '$1<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-400 underline hover:text-cyan-300 break-all inline-flex items-center gap-0.5">$2 <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>');
 
-      return html;
+      if (window.DOMPurify) {
+        return window.DOMPurify.sanitize(html, {
+          USE_PROFILES: { html: true },
+          ADD_ATTR: ['target', 'rel']
+        });
+      }
+      return escapeHtml(md).replace(/\n/g, '<br>');
     }
 
     async function processQuestion(question) {
@@ -1229,14 +1249,17 @@
       showThinkingIndicator();
 
       let answer = null;
+      let rawAssistantReply = null;
 
-      // 1. Check if question matches predefined deterministic FAQ with >= 80% (0.80) similarity
+      // 1. Deterministic fast-path is restricted to utility actions; substantive profile/project questions go to the LLM.
       for (const faq of DETERMINISTIC_FAQ) {
+        if (!faq.utility) continue;
         for (const trigger of faq.triggers) {
           const sim = calculateSimilarity(question, trigger);
           if (sim >= 0.80) {
             const raw = faq.reply[currentLang] || faq.reply.pt;
-            answer = formatMarkdown(raw);
+            rawAssistantReply = raw;
+            answer = formatMarkdown(rawAssistantReply);
             break;
           }
         }
@@ -1254,7 +1277,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               message: question,
-              history: conversationHistory.slice(-4),
+              history: conversationHistory.slice(0, -1).slice(-4),
               model: 'openrouter/free'
             }),
             signal: controller.signal
@@ -1264,7 +1287,17 @@
           if (response.ok) {
             const data = await response.json();
             if (data.reply) {
-              answer = formatMarkdown(data.reply);
+              rawAssistantReply = String(data.reply);
+              if (Array.isArray(data.sources) && data.sources.length) {
+                const sourceLines = data.sources.map((source) => {
+                  if (typeof source === 'string') return `- ${source}`;
+                  const label = source.label || source.title || source.name || 'Source';
+                  const url = source.url ? ` (${source.url})` : '';
+                  return `- ${label}${url}`;
+                }).join('\n');
+                rawAssistantReply += `\n\n### Sources\n${sourceLines}`;
+              }
+              answer = formatMarkdown(rawAssistantReply);
             }
           }
         } catch (err) {
@@ -1279,10 +1312,11 @@
         const errorMsg = (currentLang === 'en')
           ? "⚠️ *Unable to reach the AI model at this moment (response timeout or connection instability). Please try asking again shortly.*"
           : "⚠️ *Não conseguimos obter retorno do modelo de IA neste momento (tempo limite de resposta atingido ou instabilidade na conexão). Por favor, tente novamente em instantes.*";
-        answer = formatMarkdown(errorMsg);
+        rawAssistantReply = errorMsg;
+        answer = formatMarkdown(rawAssistantReply);
       }
 
-      conversationHistory.push({ role: 'assistant', content: answer });
+      conversationHistory.push({ role: 'assistant', content: rawAssistantReply || '' });
       appendMessage('ai', answer, true);
     }
 
