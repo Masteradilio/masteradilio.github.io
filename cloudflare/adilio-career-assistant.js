@@ -1,7 +1,7 @@
 /**
  * Cloudflare Worker — Adilio Farias AI Career & Portfolio Assistant
  *
- * v2026.15: recruiter-fit context minimization and reliability.
+ * v2026.16: final recruiter-facing factual precision.
  * - strict professional-vs-portfolio evidence plans
  * - canonical per-repository provenance
  * - deterministic output validation and repair
@@ -12,7 +12,7 @@
  * - cross-gateway failover: Vercel AI Gateway -> OpenRouter -> Hugging Face Inference Providers
  */
 
-const SERVICE_VERSION = '2026.15';
+const SERVICE_VERSION = '2026.16';
 const PRODUCTION_ORIGIN = 'https://masteradilio.github.io';
 const README_CACHE_TTL_MS = 5 * 60 * 1000;
 const README_CACHE = new Map();
@@ -155,6 +155,9 @@ NON-NEGOTIABLE EVIDENCE RULES
 12. For BANPARÁ RAG work, preserve the supported verb 'developed'; do not upgrade it to 'deployed' unless the professional evidence explicitly changes.
 13. For the BRB PIX fraud model, preserve the supported wording 'led end-to-end development'; do not claim production deployment unless PROFESSIONAL EVIDENCE explicitly supports it.
 14. For rag_agent_datasus, do not call the RAG pipeline production-grade or production-ready unless its canonical README explicitly supports that wording.
+15. When answering an explicit named-technology question such as LlamaIndex, Apache Kafka or Kubernetes, explicitly name that technology in the final answer even when evidence is absent.
+16. Do not describe Sentinel-PIX as local-first; its canonical qualifiers are portfolio demonstration and synthetic simulation/customer data.
+17. Do not summarize Adilio's RAG or AI-agent experience as deployed/deploying unless supplied evidence explicitly supports deployment; BRB supports implemented, BANPARÁ supports developed, and public repositories are portfolio evidence.
 
 FINAL-ANSWER CONTRACT
 - Return only the final recruiter-facing answer.
@@ -424,7 +427,10 @@ function evidencePlanInstruction(plan, question) {
     lines.push('For portfolio MLOps, Sentinel-PIX may be described from its own README as a portfolio demonstration with synthetic simulation/customer data, FastAPI, Redis/PostgreSQL feature stores, MLflow, SHAP and drift monitoring. Do not attach BRB metrics to Sentinel-PIX.');
     lines.push('Squad Forge SE is an autonomous software-engineering control plane; do not describe it as an ML model lifecycle or drift-monitoring platform unless its own evidence says so.');
   }
-  if (/\bkubernetes\b/.test(q)) lines.push('If Kubernetes is not explicitly present in canonical project evidence, answer with insufficient evidence. Docker, FastAPI, MLOps or AWS do not imply Kubernetes.');
+  if (/\bkubernetes\b/.test(q)) lines.push('If Kubernetes is not explicitly present in canonical project evidence, answer with insufficient evidence. Docker, FastAPI, MLOps or AWS do not imply Kubernetes. Explicitly name Kubernetes in the answer.');
+  if (/\bllamaindex\b/.test(q)) lines.push('Answer the LlamaIndex question explicitly and name LlamaIndex in the final answer. If it is absent from the canonical README, say that directly and mention the supported orchestration/retrieval stack instead.');
+  if (/\bapache kafka\b|\bkafka\b/.test(q)) lines.push('Answer the Apache Kafka question explicitly and name Kafka in the final answer. If it is absent from the canonical README, say that directly.');
+  if (/\b(limitations?|limitações|limitacoes)\b/.test(q)) lines.push('For limitations, use only explicit project qualifiers, documented scope, or clearly missing deployment/validation evidence. Do not infer that an architecture lacks scalability, throughput, reliability or enterprise readiness unless the canonical README explicitly states that limitation.');
   return lines.join('\n');
 }
 
@@ -489,11 +495,11 @@ function containsKnownPortfolioOverclaim(text) {
     q.includes("brazil's pix instant payment network") ||
     q.includes('brazil’s pix instant payment network') ||
     q.includes('97% recall') ||
-    q.includes('weekly mlops pipeline')
+    q.includes('weekly mlops pipeline') ||
+    q.includes('local-first') ||
+    q.includes('local first')
   );
 
-  // Reject only affirmative claims that Squad Forge provides ML lifecycle/drift
-  // capabilities. Negative limitation statements remain valid.
   const squadPositivePatterns = [
     /squad forge.{0,140}\b(?:is|acts as|serves as|implements|includes|features|provides|supports|automates|manages)\b(?!\s+(?:not|no)\b).{0,90}\b(?:ml model lifecycle management|drift detection|model drift)\b/i,
     /squad forge.{0,100}\b(?:ml model lifecycle management|drift detection|model drift)\b.{0,80}\b(?:capability|feature|platform|pipeline)\b/i,
@@ -543,7 +549,12 @@ function containsProfessionalAttributionError(text) {
     /\bdeploy(?:ed|ment)?\b.{0,42}\b(?:pix|fraud(?:-prevention| prevention)? model)\b|\b(?:pix|fraud(?:-prevention| prevention)? model)\b.{0,42}\bdeploy(?:ed|ment)?\b/i.test(clause)
   );
 
-  return bancoMetricBad || brbLlmDeploymentUpgrade || banparaRagDeploymentUpgrade || brbPixDeploymentUpgrade;
+  const ragAgentSummaryDeploymentUpgrade = clauses.some(clause => {
+    if (/\b(?:not|never|without|no evidence (?:of|for))\b.{0,30}\bdeploy(?:ed|ing|ment)?\b/i.test(clause)) return false;
+    return /\bdeploy(?:ed|ing|ment)?\b.{0,48}\b(?:rag|ai[- ]?agent|agentic)\b|\b(?:rag|ai[- ]?agent|agentic)\b.{0,48}\bdeploy(?:ed|ing|ment)?\b/i.test(clause);
+  });
+
+  return bancoMetricBad || brbLlmDeploymentUpgrade || banparaRagDeploymentUpgrade || brbPixDeploymentUpgrade || ragAgentSummaryDeploymentUpgrade;
 }
 
 function containsDataScopeOverclaim(text) {
@@ -582,6 +593,15 @@ function missesRequiredProfessionalLead(text, plan, question) {
   return !(hasEmployerOrDomain || hasTenure || hasProfessionalLabel);
 }
 
+function missesExplicitTechnologyReference(text, question) {
+  const q = normalizeText(question);
+  const answer = normalizeText(text);
+  if (/\bllamaindex\b/.test(q) && !/\bllamaindex\b/.test(answer)) return true;
+  if (/\b(?:apache kafka|kafka)\b/.test(q) && !/\bkafka\b/.test(answer)) return true;
+  if (/\bkubernetes\b/.test(q) && !/\bkubernetes\b/.test(answer)) return true;
+  return false;
+}
+
 function validationIssues(text, plan, question) {
   const issues = [];
   if (looksIncompleteAnswer(text, question, plan)) issues.push('incomplete');
@@ -591,6 +611,7 @@ function validationIssues(text, plan, question) {
   if (containsProfessionalAttributionError(text)) issues.push('professional_attribution');
   if (containsDataScopeOverclaim(text)) issues.push('data_scope');
   if (missesRequiredProfessionalLead(text, plan, question)) issues.push('professional_lead_missing');
+  if (missesExplicitTechnologyReference(text, question)) issues.push('technology_not_addressed');
   return issues;
 }
 
@@ -715,11 +736,11 @@ async function repairAnswerAcrossGateways(credentials, route, messages, draft, q
 
   const focusRules = [];
   if (abstentionQuestion) {
-    focusRules.push('This is an evidence-boundary question. Answer the exact question in the first sentence. If the evidence does not prove the claim, explicitly say that sufficient evidence was not found; then mention only the closest supported evidence.');
+    focusRules.push('This is an evidence-boundary question. Answer the exact question in the first sentence and explicitly repeat the named technology or boundary from the user question. If the evidence does not prove the claim, say that directly; then mention only the closest supported evidence.');
     focusRules.push('Target 35-90 words. Do not discuss internal rules or how evidence was selected.');
   }
   if (limitationsQuestion) {
-    focusRules.push('Answer with the project name and 2-4 concrete limitations supported by its canonical evidence. Distinguish portfolio/local-first evidence from employer production deployment.');
+    focusRules.push('Answer with the project name and 2-4 concrete limitations supported by its canonical evidence. Use explicit qualifiers or missing deployment/validation evidence only; do not infer lack of scalability, throughput or enterprise reliability. Distinguish portfolio evidence from employer production deployment.');
     focusRules.push('Target 60-140 words.');
   }
   if (fitQuestion) {
