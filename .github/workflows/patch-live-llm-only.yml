@@ -131,3 +131,5 @@ jobs:
           git add cloudflare/adilio-career-assistant.js docs/RAG_EVAL_SUITE.md .github/workflows/portfolio-professionalization.yml
           git commit -m 'Require live LLM generation for recruiter content answers'
           git push origin HEAD:career-assistant-live-llm-only-20260822
+
+# trigger-after-workflow-exists
