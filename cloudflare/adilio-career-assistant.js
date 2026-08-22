@@ -1,7 +1,7 @@
 /**
  * Cloudflare Worker — Adilio Farias AI Career & Portfolio Assistant
  *
- * v2026.14: recruiter-grade guard precision and diagnostics.
+ * v2026.15: recruiter-fit context minimization and reliability.
  * - strict professional-vs-portfolio evidence plans
  * - canonical per-repository provenance
  * - deterministic output validation and repair
@@ -12,7 +12,7 @@
  * - cross-gateway failover: Vercel AI Gateway -> OpenRouter -> Hugging Face Inference Providers
  */
 
-const SERVICE_VERSION = '2026.14';
+const SERVICE_VERSION = '2026.15';
 const PRODUCTION_ORIGIN = 'https://masteradilio.github.io';
 const README_CACHE_TTL_MS = 5 * 60 * 1000;
 const README_CACHE = new Map();
@@ -77,6 +77,7 @@ const REPOSITORIES = {
 
 const ALL_REPOS = Object.keys(REPOSITORIES);
 const AI_ENGINEER_FEATURED = ['squad_forge_SE', 'rag_agent_datasus', 'sentinel_pix'];
+const AI_ENGINEER_FIT = ['squad_forge_SE'];
 const MLOPS_PORTFOLIO = ['sentinel_pix', 'time_series_predict'];
 const RAG_AGENT_PORTFOLIO = ['rag_agent_datasus', 'ontology_rag_guardrail', 'squad_forge_SE'];
 
@@ -274,12 +275,17 @@ function directRepoMentions(text) {
   });
 }
 
+function isFitQuestion(question) {
+  const q = normalizeText(question);
+  return /\b(interview|hire|hiring|fit|candidate|role|entrevista|contratar|vaga|candidato)\b/.test(q);
+}
+
 function classifyEvidencePlan(question) {
   const q = normalizeText(question);
   const explicitRepo = directRepoMentions(question).length > 0;
   const asksProject = /\b(project|projects|projeto|projetos|portfolio|repositorio|repository)\b/.test(q);
   const namesEmployer = /\b(brb|banpara|banco do brasil|compass uol|employer|empresa|trabalho|professional project|projeto profissional)\b/.test(q);
-  const asksFit = /\b(interview|hire|hiring|fit|candidate|role|entrevista|contratar|vaga|candidato)\b/.test(q);
+  const asksFit = isFitQuestion(question);
   const asksExperience = /\b(experience|experiencia|evidence shows|evidencia|background|historico)\b/.test(q);
   const asksProfessionalResults = /\b(measurable results|financial services|resultados mensuraveis|resultados.*financeir|impacto.*financeir)\b/.test(q);
   const asksEducation = /\b(education|certification|certifications|formacao|certificacoes|certificacao)\b/.test(q);
@@ -296,6 +302,12 @@ function selectRepos(question, history) {
   if (explicitCurrent.length) return explicitCurrent.slice(0, 3);
 
   const q = normalizeText(question);
+
+  // Recruiter-fit questions are intentionally low-context: professional CV facts
+  // are primary and Squad Forge SE is the single supplemental portfolio proof.
+  // This reduces cross-project overclaim risk and improves completion reliability.
+  if (isFitQuestion(question)) return AI_ENGINEER_FIT;
+
   if (/\b(mlops|mlflow|model lifecycle|model monitoring|drift|feature store|production-oriented machine learning|production oriented machine learning)\b/.test(q)) return MLOPS_PORTFOLIO;
   if (/\b(rag|retrieval|ai agents?|agentic|agentes? de ia|llm|langgraph|chromadb|bm25|ontology|guardrail)\b/.test(q)) return RAG_AGENT_PORTFOLIO;
   if (/\b(credit|credito|pd|lgd|ead|ecl|ifrs|scorecard|scoring)\b/.test(q)) return ['credit_risk_model', 'credit_scoring_model'];
@@ -402,6 +414,11 @@ function evidencePlanInstruction(plan, question) {
     lines.push('For this question, use PORTFOLIO EVIDENCE only. Do not use employer metrics, employer names or professional achievements to describe the portfolio projects.');
     lines.push('A portfolio project can be production-oriented in architecture without being deployed in an employer production environment. Preserve that distinction explicitly when relevant.');
   } else lines.push('For this question, lead with PROFESSIONAL EVIDENCE, then use PORTFOLIO EVIDENCE as additional proof. Phrase the boundary clearly.');
+
+  if (isFitQuestion(question)) {
+    lines.push('This is a recruiter-fit question. Start with a direct hiring recommendation grounded in PROFESSIONAL EVIDENCE. Use 2-4 of the strongest professional facts, then at most one short paragraph or bullet about Squad Forge SE as supplemental inspectable portfolio evidence.');
+    lines.push('Target 90-150 words. Do not mention unrelated portfolio repositories. Do not turn portfolio architecture into employer production experience.');
+  }
   if (/\b(experience|experiencia|evidence shows|evidencia)\b/.test(q)) lines.push('Because the user asks about experience/evidence, present professional evidence first and portfolio demonstrations second.');
   if (/\b(mlops|production-oriented machine learning|production oriented machine learning)\b/.test(q)) {
     lines.push('For portfolio MLOps, Sentinel-PIX may be described from its own README as a portfolio demonstration with synthetic simulation/customer data, FastAPI, Redis/PostgreSQL feature stores, MLflow, SHAP and drift monitoring. Do not attach BRB metrics to Sentinel-PIX.');
@@ -556,10 +573,13 @@ function looksIncompleteAnswer(text, question, plan) {
 function missesRequiredProfessionalLead(text, plan, question) {
   if (plan.mode !== 'combined') return false;
   const q = normalizeText(question);
-  if (!/\b(interview|hire|hiring|experience|evidence shows|background|candidate|role)\b/.test(q)) return false;
+  if (!isFitQuestion(question) && !/\b(experience|evidence shows|background|experiencia|evidencia|historico)\b/.test(q)) return false;
+
   const answer = normalizeText(text);
-  const markers = ['brb','banpara','financial services','15+ years','15 years','professional','aws certified','msc'];
-  return !markers.some(marker => answer.includes(normalizeText(marker)));
+  const hasEmployerOrDomain = /\b(?:brb|banco de brasilia|banpara|financial[- ]services|banking|setor financeiro)\b/.test(answer);
+  const hasTenure = /\b(?:15\+?\s*years|over\s+15\s+years|more\s+than\s+15\s+years|15\s+anos)\b/.test(answer);
+  const hasProfessionalLabel = /\b(?:professional experience|professional evidence|experiencia profissional|aws certified|msc)\b/.test(answer);
+  return !(hasEmployerOrDomain || hasTenure || hasProfessionalLabel);
 }
 
 function validationIssues(text, plan, question) {
@@ -691,6 +711,7 @@ async function repairAnswerAcrossGateways(credentials, route, messages, draft, q
   const q = normalizeText(question);
   const abstentionQuestion = /\b(kubernetes|llamaindex|apache kafka|security boundary)\b/.test(q);
   const limitationsQuestion = /\b(limitations?|limitações|limitacoes)\b/.test(q);
+  const fitQuestion = isFitQuestion(question);
 
   const focusRules = [];
   if (abstentionQuestion) {
@@ -700,6 +721,10 @@ async function repairAnswerAcrossGateways(credentials, route, messages, draft, q
   if (limitationsQuestion) {
     focusRules.push('Answer with the project name and 2-4 concrete limitations supported by its canonical evidence. Distinguish portfolio/local-first evidence from employer production deployment.');
     focusRules.push('Target 60-140 words.');
+  }
+  if (fitQuestion) {
+    focusRules.push('This is a recruiter-fit answer. Lead with professional evidence and a direct recommendation. Use only the strongest 2-4 professional facts and, if useful, one concise Squad Forge SE portfolio point.');
+    focusRules.push('Target 90-150 words. Do not mention DataSUS, Sentinel-PIX or other unrelated repositories for this fit answer.');
   }
 
   const repairMessages = [
@@ -728,7 +753,7 @@ async function repairAnswerAcrossGateways(credentials, route, messages, draft, q
     const response = await callGateway(
       candidate,
       credentials,
-      { messages: repairMessages, temperature: 0, max_tokens: abstentionQuestion ? 260 : 520 },
+      { messages: repairMessages, temperature: 0, max_tokens: abstentionQuestion ? 260 : (fitQuestion ? 1100 : 520) },
       GATEWAY_TIMEOUTS_MS.repair
     );
     attempts.push({ stage: 'repair', gateway: candidate.gateway, ok: !!response.ok, status: response.status || 0, error: response.error || null });
@@ -792,7 +817,7 @@ export default {
       }
 
       for (const candidate of route) {
-        const payload = { messages, temperature: 0.1, max_tokens: 700 };
+        const payload = { messages, temperature: 0.1, max_tokens: isFitQuestion(question) ? 1000 : 700 };
         if (explicitFileRequest(question) && repos.length === 1) {
           payload.tools = [{ type: 'function', function: { name: 'fetch_github_file', description: 'Fetch a file from the single canonical portfolio repository being discussed.', parameters: { type: 'object', properties: { repo: { type: 'string', enum: repos }, path: { type: 'string' } }, required: ['repo','path'], additionalProperties: false } } }];
           payload.tool_choice = 'auto';
