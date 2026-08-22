@@ -52,3 +52,5 @@ jobs:
           fi
           git commit -m 'Harden recruiter assistant final answer recovery'
           git push origin HEAD:career-assistant-final-resilience-20260822
+
+# trigger: final resilience 2026-08-22
