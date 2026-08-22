@@ -36,7 +36,7 @@ The site currently presents seven open-source projects covering:
 - credit scoring / Champion-vs-Challenger modeling;
 - real-time PIX anti-fraud and MLOps.
 
-Three projects are highlighted as **Featured** because together they provide the fastest cross-section of AI Engineering, Agentic RAG and production ML/MLOps capabilities.
+Three projects are highlighted as **Featured** because together they provide the fastest cross-section of AI Engineering, Agentic RAG and production-oriented ML/MLOps capabilities.
 
 ## Career assistant architecture
 
@@ -52,19 +52,32 @@ See [`docs/CLOUDFLARE_RAG_UPGRADE.md`](docs/CLOUDFLARE_RAG_UPGRADE.md) for the r
 
 ## Production-oriented frontend
 
-The professionalization branch replaces the Tailwind Play CDN with compiled CSS and adds:
+The published frontend uses compiled Tailwind CSS and includes:
 
 - Open Graph and social sharing metadata;
 - Schema.org `Person` structured data;
 - canonical URL and crawler metadata;
 - a generated 1200×630 social card;
 - `robots.txt` and `sitemap.xml`;
-- safer LLM-derived HTML rendering.
+- DOMPurify sanitization for LLM-derived HTML;
+- bilingual recruiter-facing content and project evidence.
+
+## Quality checks
+
+GitHub Actions runs reusable portfolio quality checks on changes to the public site. The workflow validates:
+
+- required sections, local assets and project links;
+- PT-BR/EN translation-key completeness;
+- recruiter-facing role positioning;
+- Open Graph and Schema.org metadata;
+- safe `target="_blank"` links;
+- career-assistant safety/grounding frontend contracts;
+- consistency between `src/input.css`/`index.html` and the committed Tailwind build.
 
 ## Source of truth
 
-Project claims shown on the portfolio should remain aligned with the corresponding repository README and committed benchmark artifacts. When a project changes materially, update the portfolio card rather than preserving stale claims.
+Project claims shown on the portfolio should remain aligned with the corresponding repository README and committed benchmark artifacts. Experimental, synthetic and backtest evidence should remain explicitly labeled as such. When a project changes materially, update the portfolio card rather than preserving stale claims.
 
-## License / repository scope
+## Repository scope
 
 This repository contains the public portfolio website and career-assistant frontend. Individual portfolio projects have their own repositories and licensing terms.
