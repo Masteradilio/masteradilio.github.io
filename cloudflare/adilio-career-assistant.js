@@ -151,6 +151,7 @@ NON-NEGOTIABLE EVIDENCE RULES
 9. Never attribute BRB's 97% Recall, weekly MLOps pipeline, millions of transactions, >2h→~24min optimization, 27% or 41% improvements to Sentinel-PIX or any portfolio repository.
 10. Never describe Squad Forge SE as an ML model lifecycle/drift platform unless its own canonical README explicitly supports that statement.
 11. For BRB LLM/RAG/AI-agent work, preserve the supported verb 'implemented'; do not upgrade it to 'deployed' unless the professional evidence explicitly changes.
+12. For BANPARÁ RAG work, preserve the supported verb 'developed'; do not upgrade it to 'deployed' unless the professional evidence explicitly changes.
 
 FINAL-ANSWER CONTRACT
 - Return only the final recruiter-facing answer.
@@ -478,7 +479,8 @@ function containsProfessionalAttributionError(text) {
   const bancoPossessive = new RegExp(`banco do brasil(?:\\'s|’s)?.{0,90}${metric}`, 'i');
   const metricAssignedToBanco = new RegExp(`${metric}.{0,90}(?:at|no|na)\\s+banco do brasil`, 'i');
   const brbLlmDeploymentUpgrade = /(?:brb|banco de brasilia).{0,180}\bdeploy(?:ed|ment)?\b.{0,80}\b(?:llm|rag|ai-agent|ai agent)\b|\bdeploy(?:ed|ment)?\b.{0,80}\b(?:llm|rag|ai-agent|ai agent)\b.{0,180}(?:brb|banco de brasilia)/i;
-  return bancoAsSubject.test(q) || bancoPossessive.test(q) || metricAssignedToBanco.test(q) || brbLlmDeploymentUpgrade.test(q);
+  const banparaRagDeploymentUpgrade = /banpara.{0,180}\bdeploy(?:ed|ment)?\b.{0,80}\brag\b|\bdeploy(?:ed|ment)?\b.{0,80}\brag\b.{0,180}banpara/i;
+  return bancoAsSubject.test(q) || bancoPossessive.test(q) || metricAssignedToBanco.test(q) || brbLlmDeploymentUpgrade.test(q) || banparaRagDeploymentUpgrade.test(q);
 }
 
 function containsDataScopeOverclaim(text) {
@@ -653,7 +655,7 @@ async function repairAnswerAcrossGateways(credentials, route, messages, draft, q
         'Do not add facts absent from the supplied evidence.',
         plan.mode === 'portfolio' ? 'This is a portfolio-only question: do not import employer metrics or claim employer production deployment.' : '',
         ...focusRules,
-        'Keep wording factual. For BRB LLM/RAG/AI-agent work, use implemented rather than deployed.'
+        'Keep wording factual. For BRB LLM/RAG/AI-agent work, use implemented rather than deployed. For BANPARÁ RAG work, use developed rather than deployed.'
       ].filter(Boolean).join('\n')
     },
     { role: 'user', content: `Question: ${question}\n\nRejected draft (for semantic reference only; rewrite from evidence):\n${draft || '(empty)'}` }
