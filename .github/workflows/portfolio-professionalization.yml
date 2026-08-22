@@ -10,6 +10,15 @@ on:
       - 'scripts/generate_social_card.py'
       - 'src/input.css'
       - '.github/workflows/portfolio-professionalization.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'scripts/patch_portfolio.py'
+      - 'scripts/generate_social_card.py'
+      - 'src/input.css'
+      - '.github/workflows/portfolio-professionalization.yml'
   workflow_dispatch:
 
 permissions:
@@ -21,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout branch
+      - name: Checkout working branch
         uses: actions/checkout@v4
         with:
           ref: portfolio-professionalization-20260822
