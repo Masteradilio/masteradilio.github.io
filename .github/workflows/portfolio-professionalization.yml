@@ -13,6 +13,7 @@ on:
       - 'scripts/patch_portfolio.py'
       - 'scripts/patch_portfolio_v2.py'
       - 'scripts/patch_portfolio_final.py'
+      - 'scripts/patch_portfolio_i18n.py'
       - 'scripts/patch_cv_positioning.py'
       - 'scripts/generate_social_card.py'
       - 'src/input.css'
@@ -43,6 +44,7 @@ jobs:
           python scripts/patch_portfolio.py
           python scripts/patch_portfolio_v2.py
           python scripts/patch_portfolio_final.py
+          python scripts/patch_portfolio_i18n.py
           python scripts/patch_cv_positioning.py
 
       - name: Build production Tailwind CSS
@@ -61,6 +63,10 @@ jobs:
           ! grep -q 'Qwen 2.5 Coder 27B' index.html
           ! grep -q 'LlamaIndex</span>' index.html
           ! grep -q 'Enterprise semantic governance and RAG framework governed by ontologies and Knowledge Graphs' index.html
+          ! grep -q 'AI Engineer and AI Engineer' assets/cv_adilio_farias_en.html
+          ! grep -q 'AI Engineer and AI Engineer' assets/cv_adilio_farias_en.txt
+          ! grep -q 'Engenheiro de IA e Engenheiro de IA' assets/cv_adilio_farias_pt.html
+          ! grep -q 'Engenheiro de IA e Engenheiro de IA' assets/cv_adilio_farias_pt.txt
           grep -q 'DOMPurify.sanitize' index.html
           grep -q 'property="og:title"' index.html
           grep -q 'conversationHistory.slice(0, -1).slice(-4)' index.html
@@ -71,9 +77,12 @@ jobs:
           grep -q 'Featured • Agentic RAG' index.html
           grep -q 'Featured • ML/MLOps' index.html
           grep -q '473.791 registros' index.html
-          grep -q '96-case EVAL benchmark' index.html
-          grep -q 'ROC-AUC 0,9818' index.html
+          grep -q 'EVAL semissintético (96 casos)' index.html
+          grep -q 'Benchmark sintético • ROC-AUC 0,9818' index.html
           grep -q 'LightGBM + Isolation Forest' index.html
+          grep -q 'data-i18n="proj7_highlight"' index.html
+          grep -q 'data-i18n-placeholder="chat_placeholder"' index.html
+          grep -q 'Querying RAG & model' index.html
           grep -q 'AI ENGINEER | SENIOR DATA SCIENTIST' assets/cv_adilio_farias_en.html
           grep -q 'ENGENHEIRO DE IA | CIENTISTA DE DADOS SÊNIOR' assets/cv_adilio_farias_pt.html
           grep -q 'AI and Machine Learning Engineer' assets/cv_adilio_farias_en.txt
@@ -89,6 +98,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No generated changes to commit.'
           else
-            git commit -m 'feat: finalize recruiter-facing portfolio evidence'
+            git commit -m 'feat: finalize bilingual recruiter-facing portfolio'
             git push origin HEAD:portfolio-professionalization-20260822
           fi
