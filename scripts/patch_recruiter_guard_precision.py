@@ -138,7 +138,6 @@ if old_needs not in text:
     raise SystemExit('needsRepair block not found')
 text = text.replace(old_needs, new_needs, 1)
 
-# Make repair attempts auditable: record the exact validation gate that rejected a draft.
 old_repair_tail = '''    const repaired = stripModelArtifacts(response.data?.choices?.[0]?.message?.content);
     const finishReason = response.data?.choices?.[0]?.finish_reason;
     if (!repaired || finishReason === 'length' || needsRepair(repaired, plan, question)) continue;
@@ -164,7 +163,6 @@ if old_repair_tail not in text:
     raise SystemExit('repair validation anchor not found')
 text = text.replace(old_repair_tail, new_repair_tail, 1)
 
-# Add validation diagnostics to the normal generation path.
 old_normal = '''        let reply = stripModelArtifacts(modelMessage.content);
         const finishReason = response.data?.choices?.[0]?.finish_reason;
         let servedGateway = candidate.gateway;
@@ -190,7 +188,6 @@ if old_normal not in text:
     raise SystemExit('normal validation anchor not found')
 text = text.replace(old_normal, new_normal, 1)
 
-# Add equivalent diagnostics to tool-followup answers.
 old_tool = '''            let reply = stripModelArtifacts(follow.data?.choices?.[0]?.message?.content);
             const finishReason = follow.data?.choices?.[0]?.finish_reason;
             let servedGateway = candidate.gateway;
@@ -216,7 +213,6 @@ if old_tool not in text:
     raise SystemExit('tool validation anchor not found')
 text = text.replace(old_tool, new_tool, 1)
 
-# Repair prompt must preserve the newly hardened wording too.
 old_wording = "Keep wording factual. For BRB LLM/RAG/AI-agent work, use implemented rather than deployed. For BANPARÁ RAG work, use developed rather than deployed."
 new_wording = old_wording + " For the BRB PIX fraud model, say that Adilio led end-to-end development rather than claiming deployment. Do not describe rag_agent_datasus as production-grade/production-ready RAG unless its canonical evidence says so."
 if old_wording not in text:
@@ -225,3 +221,5 @@ text = text.replace(old_wording, new_wording, 1)
 
 worker.write_text(text, encoding='utf-8')
 print('GUARD_PRECISION_PATCH_COMPLETE')
+
+# trigger: 2026-08-22
