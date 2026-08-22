@@ -1,17 +1,17 @@
 /**
  * Cloudflare Worker — Adilio Farias AI Career & Portfolio Assistant
  *
- * v2026.10: recruiter-facing RAG hardening.
+ * v2026.11: live-LLM recruiter RAG hardening.
  * - strict professional-vs-portfolio evidence plans
  * - canonical per-repository provenance
  * - deterministic output validation and repair
  * - chain-of-thought / internal-policy leak blocking
  * - structured sources only (the model never renders its own Sources section)
  * - source minimization
- * - resilient grounded fallbacks for critical recruiter questions
+ * - no substantive prewritten fallbacks; content answers always come from live LLM + RAG
  */
 
-const SERVICE_VERSION = '2026.10';
+const SERVICE_VERSION = '2026.11';
 const PRODUCTION_ORIGIN = 'https://masteradilio.github.io';
 const README_CACHE_TTL_MS = 5 * 60 * 1000;
 const README_CACHE = new Map();
@@ -283,9 +283,8 @@ function classifyEvidencePlan(question) {
 }
 
 function selectRepos(question, history) {
-  const contextText = [...history.slice(-3).map(item => item.content), question].join(' ');
-  const explicit = [...new Set(directRepoMentions(contextText))];
-  if (explicit.length) return explicit.slice(0, 3);
+  const explicitCurrent = [...new Set(directRepoMentions(question))];
+  if (explicitCurrent.length) return explicitCurrent.slice(0, 3);
 
   const q = normalizeText(question);
   if (/\b(mlops|mlflow|model lifecycle|model monitoring|drift|feature store|production-oriented machine learning|production oriented machine learning)\b/.test(q)) return MLOPS_PORTFOLIO;
@@ -294,6 +293,14 @@ function selectRepos(question, history) {
   if (/\b(fraud|fraude|pix|anti-fraud|antifraude|redis|isolation forest)\b/.test(q)) return ['sentinel_pix'];
   if (/\b(time series|forecast|series temporais|previsao|quantitative|bilstm|tcn)\b/.test(q)) return ['time_series_predict'];
   if (/\b(ai engineer|engenheiro de ia|strongest|mais forte|best project|melhor projeto)\b/.test(q)) return AI_ENGINEER_FEATURED;
+
+  const words = q.split(/\s+/).filter(Boolean);
+  const vagueFollowUp = words.length <= 7 && /^(why|how|what about|and|e|por que|porque|como|e quanto)\b/.test(q);
+  if (vagueFollowUp) {
+    const historical = [...new Set(directRepoMentions(history.slice(-4).map(item => item.content).join(' ')))];
+    if (historical.length) return historical.slice(0, 3);
+  }
+
   return AI_ENGINEER_FEATURED;
 }
 
@@ -438,7 +445,7 @@ function stripModelArtifacts(raw) {
 
 function containsReasoningLeak(text) {
   const q = normalizeText(text);
-  const markers = ["here's a thinking process",'thinking process','analyze user input','identify core question','scan available evidence','check against policies','the policy says','interpretation rule','system prompt','developer message','canonical repository evidence blocks',"let's draft",'i need to be careful','i should respond','user asks','scratch work','chain of thought'];
+  const markers = ["here's a thinking process",'thinking process','analyze user input','identify core question','scan available evidence','check against policies','the policy says','interpretation rule','system prompt','developer message','canonical repository evidence blocks',"let's draft",'i need to be careful','i should respond','user asks','scratch work','chain of thought','non-negotiable rule','non negotiable rule','rule states','final-answer contract','final answer contract','evidence rules','available evidence blocks'];
   return markers.some(marker => q.includes(marker)) || /(^|\n)\s*(analysis|reasoning)\s*:/i.test(text);
 }
 
@@ -458,8 +465,19 @@ function containsKnownPortfolioOverclaim(text) {
   return sentinelBad || squadBad || datasusBad || ontologyBad;
 }
 
+function containsProfessionalAttributionError(text) {
+  const q = normalizeText(text);
+  const pixAssignedToBancoDoBrasil = q.includes('banco do brasil') && (q.includes('pix') || q.includes('fraud-prevention model') || q.includes('fraud prevention model') || q.includes('97% recall'));
+  return pixAssignedToBancoDoBrasil;
+}
+
+function containsDataScopeOverclaim(text) {
+  const q = normalizeText(text);
+  return q.includes('datasus') && (q.includes('synthetic simulation') || q.includes('synthetic project') || q.includes('synthetic data'));
+}
+
 function needsRepair(text, plan) {
-  return !text || text.length < 20 || containsReasoningLeak(text) || containsPortfolioProfessionalMix(text, plan) || containsKnownPortfolioOverclaim(text);
+  return !text || text.length < 20 || containsReasoningLeak(text) || containsPortfolioProfessionalMix(text, plan) || containsKnownPortfolioOverclaim(text) || containsProfessionalAttributionError(text) || containsDataScopeOverclaim(text);
 }
 
 async function callOpenRouter(apiKey, payload, timeoutMs = 26000) {
@@ -497,19 +515,10 @@ async function executeFileLookup(repo, path) {
   return { content: ['BEGIN UNTRUSTED CANONICAL REPOSITORY FILE', `PROJECT: ${repo}`, `PATH: ${item.path}`, removeCrossProjectClaims(repo, item.content).slice(0, 7000), 'END UNTRUSTED CANONICAL REPOSITORY FILE'].join('\n'), source: item.source };
 }
 
-function localFallback(question, language, plan, repos) {
-  const q = normalizeText(question);
-  const en = language === 'en';
-  if (/\bkubernetes\b/.test(q)) return en ? 'I did not find sufficient evidence in the available sources to claim that Adilio has deployed or demonstrated Kubernetes in production. His portfolio documents Docker, FastAPI, MLOps and cloud/data-engineering practices, but those do not by themselves prove Kubernetes deployment.' : 'Não encontrei evidência suficiente nas fontes disponíveis para afirmar que Adilio implantou ou demonstrou Kubernetes em produção. O portfólio documenta Docker, FastAPI, MLOps e práticas de cloud/data engineering, mas isso não comprova por si só uso de Kubernetes.';
-  if (/llamaindex/.test(q) && repos.includes('rag_agent_datasus')) return en ? 'No. The current canonical DataSUS RAG Agent evidence does not document LlamaIndex. It documents LangGraph orchestration, ChromaDB + BM25 hybrid retrieval, Reciprocal Rank Fusion and local Hugging Face embeddings.' : 'Não. A evidência canônica atual do DataSUS RAG Agent não documenta LlamaIndex. Ela documenta orquestração com LangGraph, recuperação híbrida ChromaDB + BM25, Reciprocal Rank Fusion e embeddings locais do Hugging Face.';
-  if (/apache kafka|\bkafka\b/.test(q) && repos.includes('sentinel_pix')) return en ? 'No. The current canonical Sentinel-PIX evidence does not document Apache Kafka. It documents FastAPI, Redis/PostgreSQL feature stores, MLflow, SHAP, drift monitoring, Docker and a synthetic portfolio simulation environment.' : 'Não. A evidência canônica atual do Sentinel-PIX não documenta Apache Kafka. Ela documenta FastAPI, feature stores Redis/PostgreSQL, MLflow, SHAP, monitoramento de drift, Docker e um ambiente sintético de demonstração de portfólio.';
-  if (/production security boundary|fronteira de seguranca/.test(q) && repos.includes('ontology_rag_guardrail')) return en ? 'No. Ontology RAG Guardrail is explicitly an experimental technical portfolio project, not a production security boundary. It demonstrates semantic-trust decisions, trivalent validation, provenance, auditability and RAG/agent guardrail concepts for prototyping and evaluation.' : 'Não. O Ontology RAG Guardrail é explicitamente um projeto técnico experimental de portfólio, não uma fronteira de segurança de produção. Ele demonstra decisões de confiança semântica, validação trivalente, proveniência, auditabilidade e guardrails para RAG/agentes.';
-  if (/\b(mlops|production-oriented machine learning|production oriented machine learning)\b/.test(q) && plan.mode === 'portfolio') return en ? '**Sentinel-PIX** is the strongest portfolio example for MLOps: its canonical repository documents FastAPI serving, Redis/PostgreSQL feature stores, MLflow tracking, SHAP explainability, drift monitoring and Docker. It is a portfolio demonstration using synthetic simulation/customer data, not evidence of deployment inside a bank.\n\n**time_series_predict** complements it with leakage-aware validation, model benchmarking, FastAPI serving, Docker and automated tests in a portfolio/research setting.\n\nTogether they demonstrate production-oriented engineering practices without conflating portfolio systems with Adilio’s separate professional production experience.' : '**Sentinel-PIX** é o exemplo mais forte do portfólio para MLOps: o repositório canônico documenta serving com FastAPI, feature stores Redis/PostgreSQL, MLflow, explicabilidade SHAP, monitoramento de drift e Docker. É uma demonstração de portfólio com dados/simulações sintéticas, não evidência de implantação dentro de um banco.\n\n**time_series_predict** complementa com validação sem vazamento, benchmark de modelos, serving FastAPI, Docker e testes automatizados em contexto de portfólio/pesquisa.';
-  if (/\b(rag|ai agents?|agentes? de ia)\b/.test(q) && /\b(experience|experiencia|evidence|evidencia)\b/.test(q)) return en ? '**Professional evidence:** at BRB, Adilio implemented LLM, RAG and AI-agent solutions that reduced data-investigation and technical-support time by about 41%. At Banpará, he developed a RAG solution for roughly 30 internal regulatory/business documents.\n\n**Portfolio evidence:** the DataSUS RAG Agent demonstrates LangGraph multi-agent orchestration and ChromaDB + BM25 hybrid retrieval; Ontology RAG Guardrail demonstrates experimental semantic-trust, trivalent validation and auditability; Squad Forge SE demonstrates autonomous multi-agent software-engineering orchestration.' : '**Evidência profissional:** no BRB, Adilio implementou soluções com LLMs, RAG e agentes de IA que reduziram em cerca de 41% o tempo de investigação de dados e suporte técnico. No Banpará, desenvolveu uma solução RAG para cerca de 30 documentos internos.\n\n**Evidência de portfólio:** o DataSUS RAG Agent demonstra orquestração multiagente com LangGraph e busca híbrida ChromaDB + BM25; o Ontology RAG Guardrail demonstra confiança semântica, validação trivalente e auditabilidade; o Squad Forge SE demonstra orquestração autônoma multiagente para engenharia de software.';
-  if (/\b(interview|hire|contratar|entrevista)\b/.test(q)) return en ? 'Adilio combines 15+ years in financial services with measurable AI/ML delivery and public engineering evidence. Professionally, he led a PIX fraud model at BRB with about 97% Recall and FPR below 1%, built a weekly MLOps pipeline for millions of transactions, and delivered RAG/AI-agent solutions that reduced investigation and support time by about 41%. He also deployed a Probability of Default model for roughly 700,000 banking customers at Banpará. His portfolio adds hands-on evidence in autonomous AI engineering, Agentic RAG, MLOps, credit risk and real-time-oriented fraud architectures. That combination of domain depth, measurable delivery and inspectable code makes him a strong AI Engineer interview candidate.' : 'Adilio combina mais de 15 anos no setor financeiro com entregas mensuráveis em IA/ML e evidências públicas de engenharia. Profissionalmente, liderou um modelo antifraude PIX no BRB com cerca de 97% de Recall e FPR abaixo de 1%, estruturou uma esteira semanal de MLOps para milhões de transações e entregou soluções RAG/agentes de IA que reduziram em cerca de 41% o tempo de investigação e suporte. No Banpará, implantou um modelo de Probabilidade de Inadimplência para aproximadamente 700 mil clientes. O portfólio complementa com engenharia autônoma de IA, Agentic RAG, MLOps, risco de crédito e antifraude.';
-  if (/\b(measurable results|financial services|resultados mensuraveis|resultados.*financeir)\b/.test(q)) return en ? 'Adilio has documented measurable results across financial-services roles: about 97% Recall with FPR below 1% on a BRB PIX fraud model; >80% reduction in a critical data-processing runtime (>2h to ~24min); ~27% reduction in operational-monitoring time; ~41% reduction in data-investigation/support time; a Probability of Default model for ~700,000 Banpará customers with ~91% accuracy; ~50% reduction in manual credit-analysis time; and ~BRL 120 million in corporate financing contributions at Banco do Brasil.' : 'Adilio tem resultados mensuráveis documentados no setor financeiro: cerca de 97% de Recall com FPR abaixo de 1% em modelo antifraude PIX no BRB; redução superior a 80% em uma rotina crítica de processamento (>2h para ~24min); ~27% de redução no acompanhamento operacional; ~41% de redução no tempo de investigação/suporte; modelo de Probabilidade de Inadimplência para ~700 mil clientes do Banpará com ~91% de acurácia; ~50% de redução no tempo de análise manual de crédito; e contribuição para ~R$ 120 milhões em financiamentos empresariais no Banco do Brasil.';
-  if (/\b(limitations?|limitacoes?)\b/.test(q)) return en ? 'For an AI Engineer position, **Squad Forge SE** is one of the strongest portfolio demonstrations because it shows autonomous multi-agent software-engineering orchestration and local-LLM integration. Its main limitations are also clear: it is a personal open-source, local-first portfolio project; the repository does not prove deployment inside an employer production environment; and its engineering evidence is primarily local tests, controls and project artifacts rather than independent large-scale production validation. Those boundaries make it useful as inspectable engineering evidence, but distinct from Adilio’s separate professional production experience.' : 'Para uma posição de Engenheiro de IA, o **Squad Forge SE** é uma das demonstrações mais fortes do portfólio por mostrar orquestração multiagente para engenharia autônoma de software e integração com LLM local. As limitações também são claras: é um projeto pessoal open-source e local-first; o repositório não comprova implantação em ambiente de produção de um empregador; e suas evidências são principalmente testes, controles e artefatos locais, não validação independente em grande escala.';
-  return en ? 'I could not obtain a sufficiently reliable model response for this question. Please try again shortly; I will not replace it with an unverified claim.' : 'Não consegui obter uma resposta suficientemente confiável do modelo para esta pergunta. Tente novamente em instantes; não vou substituir a resposta por uma afirmação não verificada.';
+function unavailableReply(language) {
+  return language === 'pt'
+    ? 'O assistente de IA está temporariamente indisponível para gerar uma resposta confiável. Tente novamente em alguns instantes.'
+    : 'The AI assistant is temporarily unable to generate a reliable answer. Please try again in a few moments.';
 }
 
 async function repairAnswer(apiKey, models, messages, draft, question, plan) {
@@ -555,8 +564,8 @@ export default {
       const models = modelOrder(body, env);
 
       if (!apiKey) {
-        const fallback = localFallback(question, language, plan, repos);
-        return jsonResponse(request, { reply: fallback, sources: filterSourcesForReply(fallback, candidateSources, plan, language), model_used: 'grounded-local-fallback', status: 'success', request_id: requestId });
+        const unavailable = unavailableReply(language);
+        return jsonResponse(request, { reply: unavailable, sources: [], model_used: null, generation_mode: 'unavailable', status: 'unavailable', request_id: requestId });
       }
 
       for (const model of models) {
@@ -586,10 +595,11 @@ export default {
             let reply = stripModelArtifacts(follow.data?.choices?.[0]?.message?.content);
             if (needsRepair(reply, plan)) {
               const repaired = await repairAnswer(apiKey, models, messages, reply, question, plan);
-              reply = repaired?.reply || localFallback(question, language, plan, repos);
+              reply = repaired?.reply || '';
             }
+            if (!reply) continue;
             const allSources = dedupeSources([...candidateSources, ...toolSources]);
-            return jsonResponse(request, { reply, sources: filterSourcesForReply(reply, allSources, plan, language), model_used: model, status: 'success', tool_executed: true, request_id: requestId });
+            return jsonResponse(request, { reply, sources: filterSourcesForReply(reply, allSources, plan, language), model_used: model, generation_mode: 'llm-rag', status: 'success', tool_executed: true, request_id: requestId });
           }
           continue;
         }
@@ -597,14 +607,14 @@ export default {
         let reply = stripModelArtifacts(modelMessage.content);
         if (needsRepair(reply, plan)) {
           const repaired = await repairAnswer(apiKey, models, messages, reply, question, plan);
-          reply = repaired?.reply || localFallback(question, language, plan, repos);
+          reply = repaired?.reply || '';
         }
         if (!reply) continue;
-        return jsonResponse(request, { reply, sources: filterSourcesForReply(reply, candidateSources, plan, language), model_used: model, status: 'success', tool_executed: false, request_id: requestId });
+        return jsonResponse(request, { reply, sources: filterSourcesForReply(reply, candidateSources, plan, language), model_used: model, generation_mode: 'llm-rag', status: 'success', tool_executed: false, request_id: requestId });
       }
 
-      const fallback = localFallback(question, language, plan, repos);
-      return jsonResponse(request, { reply: fallback, sources: filterSourcesForReply(fallback, candidateSources, plan, language), model_used: 'grounded-local-fallback', status: 'success', request_id: requestId });
+      const unavailable = unavailableReply(language);
+      return jsonResponse(request, { reply: unavailable, sources: [], model_used: null, generation_mode: 'unavailable', status: 'unavailable', request_id: requestId });
     } catch (error) {
       console.error(`[${requestId}] Worker error`, error?.message || error);
       return jsonResponse(request, { error: 'Unable to process the request.', status: 'error', request_id: requestId }, 500);
