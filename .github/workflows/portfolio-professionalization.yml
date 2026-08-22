@@ -95,8 +95,14 @@ jobs:
           grep -q 'thinking process' docs/RAG_EVAL_SUITE.md
           grep -q 'employer metrics are never attached to portfolio projects' docs/RAG_EVAL_SUITE.md
 
-      - name: Validate Worker JavaScript syntax
-        run: node --check cloudflare/adilio-career-assistant.js
+      - name: Validate Worker as Cloudflare ES module
+        run: |
+          cp cloudflare/adilio-career-assistant.js /tmp/adilio-career-assistant.mjs
+          node --check /tmp/adilio-career-assistant.mjs
+          test "$(grep -c '^async function callOpenRouter' cloudflare/adilio-career-assistant.js)" -eq 1
+          test "$(grep -c '^function modelOrder' cloudflare/adilio-career-assistant.js)" -eq 1
+          test "$(grep -c '^function explicitFileRequest' cloudflare/adilio-career-assistant.js)" -eq 1
+          test "$(grep -c '^async function executeFileLookup' cloudflare/adilio-career-assistant.js)" -eq 1
 
       - name: Validate HTML structure and bilingual keys
         run: |
