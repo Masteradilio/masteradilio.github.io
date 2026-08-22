@@ -5,8 +5,23 @@ def patch(path: str, replacements: list[tuple[str, str]]) -> None:
     p = Path(path)
     text = p.read_text(encoding="utf-8")
     original = text
+
+    # Normalize the only known legacy duplicate before applying positioning rules.
+    text = text.replace(
+        "AI Engineer and AI Engineer and Senior Data Scientist",
+        "AI Engineer and Senior Data Scientist",
+    )
+    text = text.replace(
+        "Engenheiro de IA e Engenheiro de IA e Cientista de Dados",
+        "Engenheiro de IA e Cientista de Dados",
+    )
+
+    # Apply each migration only when the desired target is not already present.
+    # This makes repeated CI runs safe.
     for old, new in replacements:
-        text = text.replace(old, new)
+        if new not in text and old in text:
+            text = text.replace(old, new)
+
     if text != original:
         p.write_text(text, encoding="utf-8")
         print(f"Updated {path}")
@@ -34,8 +49,8 @@ patch(
             "AI Engineer and Senior Data Scientist with 15+ years of experience in the financial sector,",
         ),
         (
-            "<div class=\"item-sub\">Data Scientist & Machine Learning | Brasília, Federal District, Brazil</div>",
-            "<div class=\"item-sub\">AI and Machine Learning Engineer | Brasília, Federal District, Brazil</div>",
+            '<div class="item-sub">Data Scientist & Machine Learning | Brasília, Federal District, Brazil</div>',
+            '<div class="item-sub">AI and Machine Learning Engineer | Brasília, Federal District, Brazil</div>',
         ),
     ],
 )
@@ -78,8 +93,8 @@ patch(
             "Engenheiro de IA e Cientista de Dados com mais de 15 anos de experiência no setor financeiro,",
         ),
         (
-            "<div class=\"item-sub\">Cientista de Dados e Machine Learning | Brasília/DF</div>",
-            "<div class=\"item-sub\">Engenheiro de IA e Machine Learning | Brasília/DF</div>",
+            '<div class="item-sub">Cientista de Dados e Machine Learning | Brasília/DF</div>',
+            '<div class="item-sub">Engenheiro de IA e Machine Learning | Brasília/DF</div>',
         ),
     ],
 )
