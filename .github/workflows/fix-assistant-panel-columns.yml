@@ -1,0 +1,37 @@
+name: Fix assistant panel columns
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/fix-assistant-panel-columns.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-layout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply robust assistant panel layout
+        run: python scripts/fix_assistant_panel_columns.py
+
+      - name: Commit frontend fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No frontend changes needed.'
+          else
+            git commit -m 'Fix assistant architecture panel desktop columns'
+            git push origin main
+          fi
