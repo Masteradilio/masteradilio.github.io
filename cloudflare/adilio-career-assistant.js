@@ -1,7 +1,7 @@
 /**
  * Cloudflare Worker — Adilio Farias AI Career & Portfolio Assistant
  *
- * v2026.17: Vercel free-tier routing and provider diagnostics.
+ * v2026.16: final recruiter-facing factual precision.
  * - strict professional-vs-portfolio evidence plans
  * - canonical per-repository provenance
  * - deterministic output validation and repair
@@ -12,7 +12,7 @@
  * - cross-gateway failover: Vercel AI Gateway -> OpenRouter -> Hugging Face Inference Providers
  */
 
-const SERVICE_VERSION = '2026.17';
+const SERVICE_VERSION = '2026.16';
 const PRODUCTION_ORIGIN = 'https://masteradilio.github.io';
 const README_CACHE_TTL_MS = 5 * 60 * 1000;
 const README_CACHE = new Map();
@@ -180,8 +180,8 @@ Portuguese: "Como assistente de carreira de Adilio Farias, meu propósito é res
 `;
 
 const PRIMARY_MODELS = ['openrouter/free', 'openai/gpt-oss-20b:free', 'nvidia/nemotron-nano-9b-v2:free'];
-const VERCEL_PRIMARY_MODEL = 'poolside/laguna-s-2.1-free';
-const VERCEL_FALLBACK_MODELS = ['inclusionai/ling-3.0-tiny-free', 'inclusionai/ling-3.0-flash-free'];
+const VERCEL_PRIMARY_MODEL = 'openai/gpt-oss-20b';
+const VERCEL_FALLBACK_MODELS = ['google/gemini-2.5-flash-lite', 'meta/llama-3.3-70b'];
 const HF_PRIMARY_MODEL = 'openai/gpt-oss-20b:fastest';
 const GATEWAY_TIMEOUTS_MS = { vercel: 16000, openrouter: 14000, huggingface: 14000, repair: 12000 };
 
@@ -644,17 +644,6 @@ function gatewayRoute(body, env, credentials) {
   return route;
 }
 
-function classifyProviderError(status, providerBody) {
-  const q = normalizeText(providerBody);
-  if (status === 403) {
-    if (q.includes('customer_verification_required') || q.includes('requires a valid credit card')) return 'provider_403_customer_verification_required';
-    if (q.includes('restrictedmodelserror') || q.includes('free tier users do not have access to this model')) return 'provider_403_model_restricted';
-    if (q.includes('free credits temporarily have restricted access') || q.includes('paid credits continue to have unrestricted access')) return 'provider_403_free_credit_restricted';
-    if (q.includes('access_denied') || q.includes('forbidden')) return 'provider_403_access_denied';
-  }
-  return `provider_${status}`;
-}
-
 async function callJsonEndpoint(url, apiKey, payload, timeoutMs, extraHeaders = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -671,12 +660,7 @@ async function callJsonEndpoint(url, apiKey, payload, timeoutMs, extraHeaders = 
     });
     if (!response.ok) {
       const providerBody = await response.text().catch(() => '');
-      return {
-        ok: false,
-        status: response.status,
-        error: classifyProviderError(response.status, providerBody),
-        providerBody: providerBody.slice(0, 500)
-      };
+      return { ok: false, status: response.status, error: `provider_${response.status}`, providerBody: providerBody.slice(0, 500) };
     }
     return { ok: true, status: response.status, data: await response.json() };
   } catch (error) {
