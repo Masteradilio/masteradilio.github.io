@@ -1,0 +1,55 @@
+name: Add RAG assistant architecture panel
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/patch-rag-assistant-panel.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply frontend panel patch
+        run: python scripts/patch_rag_assistant_architecture_panel.py
+
+      - name: Validate assistant DOM contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path('index.html').read_text(encoding='utf-8')
+          required = [
+              'Built by me — How this assistant works',
+              'id="rag-architecture-panel"',
+              'lg:grid-cols-[minmax(0,2fr)_minmax(300px,0.85fr)]',
+              'This RAG assistant is itself a portfolio project demonstrating how I can design similar AI assistants for internal knowledge and customer support for companies.'
+          ]
+          for item in required:
+              assert item in text, item
+          for token in ['id="chat-box"', 'id="chat-form"', 'id="chat-input"', 'id="chat-submit-btn"', 'id="bot-welcome-msg"']:
+              assert text.count(token) == 1, (token, text.count(token))
+          print('FRONTEND_DOM_CONTRACT_OK')
+          PY
+
+      - name: Commit index only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No frontend changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Add technical architecture panel beside RAG assistant'
+          git push origin HEAD:main
