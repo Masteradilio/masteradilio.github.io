@@ -43,8 +43,31 @@
     }
     .assistant-architecture-card {
       min-width: 0;
-      height: 100%;
-      overflow: visible;
+      overflow: hidden;
+    }
+    .architecture-capabilities {
+      display: grid;
+      grid-template-rows: repeat(6, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+    .architecture-capability {
+      min-height: 0;
+      padding: 0.7rem 0.75rem;
+      border: 1px solid rgba(51, 65, 85, 0.72);
+      border-radius: 0.75rem;
+      background: rgba(15, 23, 42, 0.50);
+      align-items: flex-start;
+    }
+    .architecture-capability > div:last-child { min-width: 0; }
+    .architecture-closing {
+      margin-top: 0.9rem;
+      padding: 0.85rem 0.9rem;
+      border: 1px solid rgba(6, 182, 212, 0.18);
+      border-radius: 0.75rem;
+      background: rgba(6, 182, 212, 0.055);
+    }
+    @media (max-width: 1099px) {
+      .architecture-capabilities { grid-template-rows: none; }
     }
     @media (min-width: 1100px) {
       .assistant-stage {
@@ -714,7 +737,7 @@
           <p class="text-[11px] text-slate-400 italic text-center sm:text-left mt-2" data-i18n="chat_latency_note">Observação: as respostas de conteúdo são geradas pelo LLM com RAG e podem levar até 60 segundos no tier gratuito. Contato e acesso ao currículo usam apenas respostas utilitárias determinísticas.</p>
         </div>
 
-        <aside id="rag-architecture-panel" class="assistant-architecture-card rounded-2xl bg-slate-950/70 border border-cyan-500/25 p-5 sm:p-6 flex flex-col shadow-lg shadow-cyan-950/20">
+        <aside id="rag-architecture-panel" class="assistant-architecture-card glass-card rounded-2xl p-6 sm:p-8 border border-cyan-500/40 shadow-2xl glow-cyan flex flex-col">
           <div class="flex items-start gap-3 pb-4 border-b border-slate-800">
             <div class="w-9 h-9 rounded-lg bg-cyan-500/15 border border-cyan-500/25 text-cyan-300 flex items-center justify-center shrink-0">
               <i class="fa-solid fa-diagram-project"></i>
@@ -725,34 +748,34 @@
             </div>
           </div>
 
-          <div class="flex-1 py-4 space-y-3">
-            <div class="flex gap-3">
+          <div class="architecture-capabilities flex-1 py-5">
+            <div class="architecture-capability flex gap-3">
               <div class="w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-database text-[11px]"></i></div>
-              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_1_title">Grounded RAG</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_1_desc">Respostas fundamentadas no meu currículo e nos meus Github Projects públicos.</p></div>
+              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_1_title">Grounded RAG</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_1_desc">Recupera contexto relevante do meu currículo e dos meus Github Projects públicos antes de cada resposta gerada pelo LLM.</p></div>
             </div>
-            <div class="flex gap-3">
+            <div class="architecture-capability flex gap-3">
               <div class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-link text-[11px]"></i></div>
-              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_2_title">Source attribution</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_2_desc">As respostas referenciam as fontes de portfólio usadas como evidência de suporte.</p></div>
+              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_2_title">Source attribution</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_2_desc">Cada resposta pode apresentar as fontes utilizadas como evidência, permitindo verificar as afirmações diretamente nos materiais de origem.</p></div>
             </div>
-            <div class="flex gap-3">
+            <div class="architecture-capability flex gap-3">
               <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-arrows-rotate text-[11px]"></i></div>
-              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_3_title">Multi-provider fallback</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_3_desc">Vercel AI Gateway, OpenRouter e Hugging Face fornecem roteamento resiliente de LLMs e failover.</p></div>
+              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_3_title">Multi-provider fallback</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_3_desc">Vercel AI Gateway atua como rota principal, com OpenRouter e Hugging Face fornecendo failover entre provedores para maior disponibilidade.</p></div>
             </div>
-            <div class="flex gap-3">
+            <div class="architecture-capability flex gap-3">
               <div class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-shield-halved text-[11px]"></i></div>
-              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_4_title">Guardrails</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_4_desc">A validação separa experiência profissional de evidências de portfólio e bloqueia afirmações sem suporte.</p></div>
+              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_4_title">Guardrails</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_4_desc">A validação pós-geração separa experiência profissional de evidências de portfólio e rejeita afirmações sem suporte ou exageradas.</p></div>
             </div>
-            <div class="flex gap-3">
+            <div class="architecture-capability flex gap-3">
               <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-language text-[11px]"></i></div>
-              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_5_title">Bilingual UX</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_5_desc">Suporte a PT-BR e inglês em toda a experiência.</p></div>
+              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_5_title">Bilingual UX</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_5_desc">A interface e as respostas suportam PT-BR e inglês, mantendo a interação consistente nos dois idiomas.</p></div>
             </div>
-            <div class="flex gap-3">
+            <div class="architecture-capability flex gap-3">
               <div class="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-gears text-[11px]"></i></div>
-              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_6_title">Production mindset</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_6_desc">Construído com grounding de fontes, validação de saída, resiliência e experiência do usuário em mente.</p></div>
+              <div><h4 class="text-xs font-bold text-white" data-i18n="bot_arch_6_title">Production mindset</h4><p class="text-[11px] text-slate-400 leading-relaxed mt-0.5" data-i18n="bot_arch_6_desc">Combina RAG, retries, failover entre provedores, validação de saída, grounding de fontes e abstention segura para operação resiliente.</p></div>
             </div>
           </div>
 
-          <div class="pt-4 border-t border-slate-800">
+          <div class="architecture-closing">
             <p class="text-[11px] text-slate-300 leading-relaxed" data-i18n="bot_arch_closing">Este assistente RAG é, por si só, um projeto de portfólio que demonstra como posso projetar assistentes de IA semelhantes para conhecimento interno e suporte ao cliente em empresas.</p>
           </div>
         </aside>
@@ -883,17 +906,17 @@
         bot_subtitle: "Faça sua própria pergunta sobre minhas experiências, formação ou projetos. Perguntas de conteúdo são respondidas pelo LLM com contexto RAG.",
         bot_arch_title: "Built by me — How this assistant works",
         bot_arch_1_title: "Grounded RAG",
-        bot_arch_1_desc: "Respostas fundamentadas no meu currículo e nos meus Github Projects públicos.",
+        bot_arch_1_desc: "Recupera contexto relevante do meu currículo e dos meus Github Projects públicos antes de cada resposta gerada pelo LLM.",
         bot_arch_2_title: "Atribuição de fontes",
-        bot_arch_2_desc: "As respostas referenciam as fontes de portfólio usadas como evidência de suporte.",
+        bot_arch_2_desc: "Cada resposta pode apresentar as fontes utilizadas como evidência, permitindo verificar as afirmações diretamente nos materiais de origem.",
         bot_arch_3_title: "Fallback multi-provider",
-        bot_arch_3_desc: "Vercel AI Gateway, OpenRouter e Hugging Face fornecem roteamento resiliente de LLMs e failover.",
+        bot_arch_3_desc: "Vercel AI Gateway atua como rota principal, com OpenRouter e Hugging Face fornecendo failover entre provedores para maior disponibilidade.",
         bot_arch_4_title: "Guardrails",
-        bot_arch_4_desc: "A validação separa experiência profissional de evidências de portfólio e bloqueia afirmações sem suporte.",
+        bot_arch_4_desc: "A validação pós-geração separa experiência profissional de evidências de portfólio e rejeita afirmações sem suporte ou exageradas.",
         bot_arch_5_title: "Experiência bilíngue",
-        bot_arch_5_desc: "Suporte a PT-BR e inglês em toda a experiência.",
+        bot_arch_5_desc: "A interface e as respostas suportam PT-BR e inglês, mantendo a interação consistente nos dois idiomas.",
         bot_arch_6_title: "Mentalidade de produção",
-        bot_arch_6_desc: "Construído com grounding de fontes, validação de saída, resiliência e experiência do usuário em mente.",
+        bot_arch_6_desc: "Combina RAG, retries, failover entre provedores, validação de saída, grounding de fontes e abstention segura para operação resiliente.",
         bot_arch_closing: "Este assistente RAG é, por si só, um projeto de portfólio que demonstra como posso projetar assistentes de IA semelhantes para conhecimento interno e suporte ao cliente em empresas.",
         bot_welcome: "Olá! Sou o assistente virtual de <strong>Adilio Farias</strong>. Estou conectado aos currículos e aos READMEs técnicos dos repositórios públicos. Pergunte sobre a experiência profissional, formação e projetos de Adilio.",
         bot_send_btn: "Perguntar",
@@ -1003,17 +1026,17 @@
         bot_subtitle: "Ask your own question about my experience, education, or projects. Content questions are answered by the LLM using RAG context.",
         bot_arch_title: "Built by me — How this assistant works",
         bot_arch_1_title: "Grounded RAG",
-        bot_arch_1_desc: "Answers are grounded in my resume and public Github Projects.",
+        bot_arch_1_desc: "Retrieves relevant context from my resume and public Github Projects before the LLM generates each answer.",
         bot_arch_2_title: "Source attribution",
-        bot_arch_2_desc: "Responses reference the portfolio sources used as supporting evidence.",
+        bot_arch_2_desc: "Each answer can surface the sources used as evidence, making claims directly inspectable against the underlying materials.",
         bot_arch_3_title: "Multi-provider fallback",
-        bot_arch_3_desc: "Vercel AI Gateway, OpenRouter, and Hugging Face provide resilient LLM routing and failover.",
+        bot_arch_3_desc: "Vercel AI Gateway is the primary route, with OpenRouter and Hugging Face providing cross-provider failover for higher availability.",
         bot_arch_4_title: "Guardrails",
-        bot_arch_4_desc: "Validation separates professional experience from portfolio evidence and blocks unsupported claims.",
+        bot_arch_4_desc: "Post-generation validation separates professional experience from portfolio evidence and rejects unsupported or overstated claims.",
         bot_arch_5_title: "Bilingual UX",
-        bot_arch_5_desc: "Supports PT-BR and English across the experience.",
+        bot_arch_5_desc: "The interface and generated answers support both PT-BR and English with a consistent bilingual experience.",
         bot_arch_6_title: "Production mindset",
-        bot_arch_6_desc: "Built with source grounding, output validation, resilience, and user experience in mind.",
+        bot_arch_6_desc: "Combines RAG, retries, provider failover, output validation, source grounding, and safe abstention for resilient operation.",
         bot_arch_closing: "This RAG assistant is itself a portfolio project demonstrating how I can design similar AI assistants for internal knowledge and customer support for companies.",
         bot_welcome: "Hello! I am the virtual assistant for <strong>Adilio Farias</strong>. I use Adilio's resume and the technical READMEs of his public repositories as career context. Ask about Adilio's professional experience, education, and projects.",
         bot_send_btn: "Ask",
