@@ -1,0 +1,35 @@
+name: Restore recruiter-ready v2026.16
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/restore-recruiter-ready-v16.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Revert Vercel routing experiment only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git revert --no-edit 896839cfdf0d6ba84c27a2904545646cb4f653a4
+          git push origin HEAD:main
+
+      - name: Verify restored Worker
+        run: |
+          grep -q "SERVICE_VERSION = '2026.16'" cloudflare/adilio-career-assistant.js
+          cp cloudflare/adilio-career-assistant.js /tmp/adilio-career-assistant.mjs
+          node --check /tmp/adilio-career-assistant.mjs
